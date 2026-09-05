@@ -1,0 +1,73 @@
+plugins:
+  - rubocop-minitest
+
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  TargetRubyVersion: 3.1
+  UseCache: false
+  Exclude:
+    - "vendor/**/*"
+
+Layout/LineLength:
+  Max: 180
+
+Metrics/AbcSize:
+  Max: 55
+  Exclude:
+    - "test/**/*"
+
+Metrics/ClassLength:
+  Max: 350
+
+Metrics/MethodLength:
+  Max: 100
+
+Metrics/BlockLength:
+  Exclude:
+    - "test/**/*"
+    - "*.gemspec"
+
+Metrics/CyclomaticComplexity:
+  Max: 20
+
+Metrics/ModuleLength:
+  Max: 120
+
+Metrics/PerceivedComplexity:
+  Max: 25
+
+Style/Documentation:
+  Enabled: false
+
+Style/StringLiterals:
+  EnforcedStyle: double_quotes
+
+Minitest/EmptyLineBeforeAssertionMethods:
+  Enabled: false
+
+Minitest/MultipleAssertions:
+  Max: 50
+
+Minitest/AssertionInLifecycleHook:
+  Enabled: false
+
+Minitest/AssertTruthy:
+  Enabled: false
+
+Minitest/RefuteFalse:
+  Enabled: false
+
+Minitest/AssertWithExpectedArgument:
+  Enabled: false
+
+Naming/FileName:
+  Exclude:
+    - "lib/jekyll-slides.rb"
+
+Lint/MissingSuper:
+  Exclude:
+    - "lib/jekyll/slides/layout.rb"
+
+Style/ClassAndModuleChildren:
+  Enabled: false

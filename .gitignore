@@ -1,0 +1,15 @@
+/.bundle/
+/.jekyll-cache/
+/coverage/
+/pkg/
+/tmp/
+/Gemfile.lock
+/node_modules/
+/examples/_site/
+/examples/.jekyll-cache/
+/examples/Gemfile.lock
+*.gem
+.DS_Store
+.gstack/
+/.omx/
+/docs/handoffs/

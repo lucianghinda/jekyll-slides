@@ -1,0 +1,35 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ruby: "3.1"
+            jekyll: "~> 4.3.0"
+          - ruby: "3.1"
+            jekyll: ">= 4.4"
+          - ruby: "3.4"
+            jekyll: ">= 4.4"
+          - ruby: "4.0"
+            jekyll: ">= 4.4"
+    env:
+      JEKYLL_VERSION: ${{ matrix.jekyll }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby }}
+          bundler-cache: true
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: bundle exec rake

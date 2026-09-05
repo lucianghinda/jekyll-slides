@@ -1,0 +1,28 @@
+<nav class="slide-controls" data-slide-controls aria-label="Slide navigation">
+  <button type="button" class="slide-control slide-control-previous" data-slide-previous aria-label="Previous slide">
+    <span aria-hidden="true">&larr;</span>
+    <span class="visually-hidden">Previous slide</span>
+  </button>
+  <button type="button" class="slide-control slide-control-next" data-slide-next aria-label="Next slide">
+    <span aria-hidden="true">&rarr;</span>
+    <span class="visually-hidden">Next slide</span>
+  </button>
+
+  {% if page.slides_overview %}
+    <button type="button" class="slide-control slide-control-overview" data-slide-overview aria-describedby="slides-overview-hint" aria-label="Show slide overview" aria-pressed="false">
+      <span aria-hidden="true">&#9638;</span>
+      <span class="visually-hidden">Overview</span>
+    </button>
+  {% endif %}
+
+  {% if page.slides_fullscreen %}
+    <button type="button" class="slide-control slide-control-fullscreen" data-slide-fullscreen aria-label="Enter fullscreen" aria-pressed="false">
+      <span aria-hidden="true">&#x26F6;</span>
+      <span class="visually-hidden">Fullscreen</span>
+    </button>
+  {% endif %}
+
+  {% if page.slides_slide_numbers %}
+    <p class="slide-counter" data-slide-counter aria-live="polite" aria-atomic="true">1 / {{ page.slides_count | escape }}</p>
+  {% endif %}
+</nav>

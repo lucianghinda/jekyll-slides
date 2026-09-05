@@ -1,0 +1,14 @@
+title: Beautiful Ruby
+description: A refactoring story told with Ruby and Jekyll Slides
+url: https://example.test
+baseurl: ""
+markdown: kramdown
+plugins:
+  - jekyll-slides
+slides:
+  theme: midnight
+  aspect_ratio: "16:9"
+  progress: true
+  slide_numbers: true
+  overview: true
+  fullscreen: true

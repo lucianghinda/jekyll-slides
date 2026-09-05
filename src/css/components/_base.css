@@ -1,0 +1,102 @@
+html, body { min-height: 100%; margin: 0; }
+body {
+  background: var(--slide-bg);
+  color: var(--slide-fg);
+  font-family: var(--font-slide-sans);
+  font-weight: 400;
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+}
+
+.presentation-root {
+  min-height: 100dvh;
+  background: var(--slide-bg);
+  color: var(--slide-fg);
+}
+
+.presentation-root:not(.js) .slide-deck { display: flex; width: 100%; min-height: 0; height: auto; flex-direction: column; align-items: center; gap: 2rem; overflow: visible; padding: 2rem; }
+.presentation-root:not(.js) .slide { position: relative; width: min(100%, var(--slide-canvas-width)); height: auto; aspect-ratio: 16 / 9; overflow: visible; }
+.presentation-root:not(.js) .slide-content { height: auto; min-height: 0; }
+.presentation-root.js .slide-deck { display: flex; width: 100%; min-height: 0; height: auto; flex-direction: column; align-items: center; gap: 2rem; overflow: visible; padding: 2rem; }
+.presentation-root.js .slide { position: relative; width: min(100%, var(--slide-canvas-width)); height: auto; aspect-ratio: 16 / 9; overflow: visible; }
+.presentation-root.js .slide-content { height: auto; min-height: 0; }
+
+.slide-deck {
+  @apply relative;
+  width: 100vw;
+  height: 100dvh;
+  min-height: 0;
+  container-type: size;
+  isolation: isolate;
+}
+
+.slide {
+  position: relative;
+  width: var(--slide-canvas-width);
+  height: var(--slide-canvas-height);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  color: var(--slide-fg);
+  background: var(--slide-bg);
+}
+
+@supports (width: 1cqw) and (height: 1cqh) and (transform: scale(tan(atan2(1px, 1px)))) {
+  .presentation-root.js { width: 100vw; height: 100dvh; min-height: 0; overflow: hidden; }
+  .presentation-root.js .slide-deck { display: grid; place-items: center; width: 100%; height: 100%; min-height: 0; container-type: size; gap: 0; padding: 0; overflow: hidden; }
+  .presentation-root.js .slide {
+    --slide-scale: min(tan(atan2(100cqw, 1920px)), tan(atan2(100cqh, 1080px)));
+    position: absolute;
+    inset: auto;
+    top: 50%;
+    left: 50%;
+    right: auto;
+    bottom: auto;
+    width: var(--slide-canvas-width);
+    height: var(--slide-canvas-height);
+    margin: 0;
+    overflow: hidden;
+    transform: translate(-50%, -50%) scale(var(--slide-scale, 1));
+    transform-origin: center;
+  }
+  .presentation-root.js .slide-content { height: 100%; }
+  .presentation-root.js:not(.is-overview) .slide:not(.is-active) { visibility: hidden; pointer-events: none; }
+  .presentation-root.js[data-overview-active="false"] .slide:not(.is-active) { visibility: hidden; pointer-events: none; }
+}
+
+.slide-content {
+  @apply relative flex flex-col;
+  width: 100%;
+  height: 100%;
+  padding: 108px 132px 100px;
+  z-index: 1;
+}
+
+:where(.prose, .layout-split-code .pane) {
+  max-width: 100%;
+  font-size: var(--slide-body-font-size);
+  line-height: 1.4;
+  letter-spacing: 0;
+}
+:where(.prose, .layout-split-code .pane) :where(h1, h2, h3, h4) { margin: 0 0 32px; max-width: 16ch; line-height: 1.12; letter-spacing: -.012em; text-wrap: balance; }
+:where(.prose, .layout-split-code .pane) :where(h1, h2) { font-size: var(--slide-heading-font-size); font-weight: 600; }
+:where(.prose, .layout-split-code .pane) h3 { font-size: 56px; font-weight: 600; }
+:where(.prose, .layout-split-code .pane) h4 { font-size: 44px; font-weight: 600; }
+:where(.prose, .layout-split-code .pane) p { max-width: 40ch; margin: 0 0 28px; }
+:where(.prose, .layout-split-code .pane) strong { font-weight: 700; color: var(--slide-accent-strong); }
+:where(.prose, .layout-split-code .pane) em { color: var(--slide-quote); }
+:where(.prose, .layout-split-code .pane) a { color: var(--slide-link); text-decoration: underline; text-decoration-thickness: 3px; text-underline-offset: 6px; }
+:where(.prose, .layout-split-code .pane) :where(ul, ol) { margin: 0 0 28px; padding-inline-start: 1.25em; max-width: 34ch; }
+:where(.prose, .layout-split-code .pane) ul { list-style-type: disc; }
+:where(.prose, .layout-split-code .pane) ol { list-style-type: decimal; }
+:where(.prose, .layout-split-code .pane) ul ul { list-style-type: circle; }
+:where(.prose, .layout-split-code .pane) ol ol { list-style-type: lower-alpha; }
+:where(.prose, .layout-split-code .pane) li { padding-inline-start: .2em; margin-block: .25em; }
+:where(.prose, .layout-split-code .pane) li::marker { color: var(--slide-accent); }
+:where(.prose, .layout-split-code .pane) code:not(pre code) { padding: .12em .28em; border: 1px solid var(--slide-code-border); border-radius: 8px; background: var(--slide-code-surface); color: var(--slide-accent-strong); font-family: var(--font-slide-mono); font-size: .95em; font-variant-ligatures: none; }
+:where(.prose, .layout-split-code .pane) blockquote { max-width: 34ch; margin: 0 0 28px; padding: 12px 28px; border-inline-start: 6px solid var(--slide-accent); color: var(--slide-quote); font-style: italic; }
+:where(.prose, .layout-split-code .pane) img { display: block; max-width: 100%; max-height: 520px; border-radius: 20px; object-fit: contain; }
+:where(.prose, .layout-split-code .pane) table { border-collapse: collapse; margin-block: 16px 28px; font-size: 1em; }
+:where(.prose, .layout-split-code .pane) th, :where(.prose, .layout-split-code .pane) td { border-bottom: 2px solid var(--slide-code-border); padding: 12px 20px; text-align: start; }
+:where(.prose, .layout-split-code .pane) th { color: var(--slide-accent-strong); font-weight: 700; }
+
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }

@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "scripts": {
+    "build:css": "tailwindcss -i ./src/css/app.css -o ./assets/css/presentation.css --minify",
+    "dev:css": "tailwindcss -i ./src/css/app.css -o ./assets/css/presentation.css --watch",
+    "test": "node --test test/javascript/presentation_test.js",
+    "test:javascript": "node --test test/javascript/presentation_test.js",
+    "test:css": "ruby -Itest test/presentation_css_test.rb"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.1.13",
+    "tailwindcss": "^4.1.13"
+  }
+}

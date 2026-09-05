@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="{{ page.lang | default: site.lang | default: 'en' | escape }}" data-theme="{{ page.slides_theme | escape }}">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ page.title | default: site.title | default: 'Presentation' | escape }}</title>
+    <link rel="stylesheet" href="{{ '/assets/css/presentation.css' | relative_url }}">
+    <script defer src="{{ '/assets/js/presentation.js' | relative_url }}"></script>
+  </head>
+  <body>
+    <div
+      class="presentation-root"
+      data-presentation-root
+      data-theme="{{ page.slides_theme | escape }}"
+      data-aspect-ratio="{{ page.slides_aspect_ratio | escape }}"
+      data-progress="{{ page.slides_progress | escape }}"
+      data-slide-numbers="{{ page.slides_slide_numbers | escape }}"
+      data-overview="{{ page.slides_overview | escape }}"
+      data-fullscreen="{{ page.slides_fullscreen | escape }}"
+      data-slide-count="{{ page.slides_count | escape }}"
+    >
+      <header class="presentation-chrome" data-presentation-chrome>
+        {% include slides/controls.html %}
+        {% include slides/progress.html %}
+      </header>
+
+      <main class="slide-deck" data-slide-deck aria-label="Presentation slides"{% if page.slides_overview %} aria-describedby="slides-overview-hint"{% endif %}>
+        {{ content }}
+      </main>
+
+      {% if page.slides_overview %}
+        {% include slides/overview.html %}
+      {% endif %}
+    </div>
+  </body>
+</html>

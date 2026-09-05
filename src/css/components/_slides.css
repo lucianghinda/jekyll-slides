@@ -1,0 +1,70 @@
+.slide { isolation: isolate; }
+.slide::before, .slide::after { content: none; position: absolute; pointer-events: none; }
+.slide::before { inset: 0; z-index: 0; background: var(--slide-bg); }
+.bg-plain::before { content: ""; background: var(--slide-bg); }
+.bg-gradient::before { content: ""; background: linear-gradient(135deg, var(--slide-gradient-start), var(--slide-gradient-end) 64%); }
+.bg-grid::before { content: ""; background-color: var(--slide-bg); background-image: linear-gradient(var(--slide-grid-line) 1px, transparent 1px), linear-gradient(90deg, var(--slide-grid-line) 1px, transparent 1px); background-size: 72px 72px; }
+.bg-spotlight::before { content: ""; background: radial-gradient(circle at 70% 18%, var(--slide-spotlight), transparent 42%), var(--slide-bg); }
+.bg-gradient::after, .bg-grid::after, .bg-spotlight::after { content: ""; z-index: 0; width: 70%; height: 70%; top: -28%; right: -12%; border-radius: 50%; background: var(--slide-spotlight); filter: blur(90px); opacity: .5; }
+
+.layout-title .slide-content { justify-content: center; padding-inline: 180px; }
+.layout-title .prose h1 { max-width: 12ch; font-size: var(--slide-title-font-size); }
+.layout-title .prose p { max-width: 28ch; color: var(--slide-muted); }
+.layout-statement .slide-content { justify-content: center; padding-inline: 180px; }
+.layout-statement .prose { font-size: var(--slide-statement-font-size); line-height: 1.12; letter-spacing: -.012em; }
+.layout-statement .prose :where(h1, h2) { margin-block-end: 36px; font-size: var(--slide-statement-font-size); line-height: 1.12; }
+.layout-statement .prose p { font-size: var(--slide-body-font-size); line-height: 1.4; letter-spacing: 0; }
+.layout-statement .prose p { max-width: 20ch; }
+.layout-content .slide-content { justify-content: center; }
+.layout-content .prose { max-width: 920px; }
+.layout-code .slide-content { justify-content: center; gap: 50px; }
+.layout-code .prose { flex: 0 0 auto; }
+.visual, .stack { display: flex; flex-direction: column; min-height: 0; }
+.layout-code .visual { width: 100%; max-width: none; min-height: 0; margin-inline: auto; }
+.layout-code-left .slide-content, .layout-code-right .slide-content, .layout-split-code .slide-content { justify-content: center; }
+.panes { @apply grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); align-items: center; gap: 72px; width: 100%; min-height: 0; }
+.layout-code-left .panes { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); }
+.layout-code-right .panes { grid-template-columns: minmax(0, 1fr) minmax(0, 1.55fr); }
+.pane { min-width: 0; min-height: 0; max-height: 100%; }
+.pane.prose { max-width: 640px; }
+.layout-split-code .panes { align-items: stretch; }
+.layout-split-code .pane { display: flex; flex-direction: column; min-width: 0; }
+.layout-split-code .pane > ul > li::marker, .layout-split-code .pane > ol > li::marker { color: var(--slide-accent); }
+.layout-code-result .slide-content { justify-content: center; gap: 24px; }
+.layout-code-result .prose { flex: 0 0 auto; }
+.layout-code-result .prose :where(h1, h2) { max-width: 24ch; }
+.layout-code-result .prose p { margin-bottom: 16px; }
+.layout-code-result .stack { display: flex; flex-direction: column; gap: 24px; min-height: 0; }
+.stack { min-width: 0; }
+
+@media (max-width: 900px) {
+  .presentation-root:not(.js) .slide-content { padding: clamp(24px, 6vw, 56px); }
+  .presentation-root:not(.js) :is(.prose, .pane) :where(h1, h2) { font-size: clamp(32px, 7vw, 64px); }
+  .presentation-root:not(.js) :is(.prose, .pane) :where(h3, h4) { font-size: clamp(26px, 5vw, 44px); }
+  .presentation-root:not(.js) .prose { font-size: clamp(22px, 4vw, 40px); }
+}
+
+@media (max-width: 900px) {
+  .presentation-root:not(.js) .layout-code-left .panes,
+  .presentation-root:not(.js) .layout-code-right .panes,
+  .presentation-root:not(.js) .layout-split-code .panes { grid-template-columns: 1fr; gap: 40px; }
+}
+
+@supports not ((width: 1cqw) and (height: 1cqh) and (transform: scale(tan(atan2(1px, 1px))))) {
+  @media (max-width: 900px) {
+    .presentation-root.js .slide-content { padding: 56px; }
+    .presentation-root.js .prose h1 { font-size: clamp(48px, 9vw, 88px); }
+    .presentation-root.js .prose { font-size: clamp(22px, 4vw, 40px); }
+    .presentation-root.js .layout-code-left .panes,
+    .presentation-root.js .layout-code-right .panes,
+    .presentation-root.js .layout-split-code .panes { grid-template-columns: 1fr; gap: 40px; }
+  }
+}
+
+@supports (width: 1cqw) and (height: 1cqh) and (transform: scale(tan(atan2(1px, 1px)))) {
+  .presentation-root.js.is-overview .slide-deck, .presentation-root.js[data-overview-active="true"] .slide-deck { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(360px, 42vw), 1fr)); grid-auto-rows: max-content; align-items: start; align-content: start; gap: 32px; padding: 112px 48px 56px; overflow: auto; }
+  .presentation-root.js.is-overview .slide, .presentation-root.js[data-overview-active="true"] .slide { container-type: inline-size; position: relative; inset: auto; top: auto; left: auto; margin: 0; width: 100%; height: auto; aspect-ratio: 16 / 9; min-width: 0; overflow: hidden; transform: none; visibility: visible; border: 2px solid var(--slide-code-border); border-radius: 16px; box-shadow: 0 12px 28px var(--slide-code-shadow); cursor: pointer; }
+  .presentation-root.js.is-overview .slide.is-active, .presentation-root.js[data-overview-active="true"] .slide.is-active { border-color: var(--slide-accent); box-shadow: 0 0 0 4px var(--slide-highlight), 0 12px 28px var(--slide-code-shadow); }
+  .presentation-root.js.is-overview .slide-content, .presentation-root.js[data-overview-active="true"] .slide-content { --overview-slide-scale: tan(atan2(100cqw, 1920px)); width: 1920px; height: 1080px; padding: 108px 132px 100px; transform: scale(var(--overview-slide-scale, 1)); transform-origin: top left; }
+  .presentation-root.js.is-overview .slide:focus-visible, .presentation-root.js[data-overview-active="true"] .slide:focus-visible { outline: 5px solid var(--slide-focus); outline-offset: 6px; }
+}

@@ -1,0 +1,14 @@
+@page { size: 13.333in 7.5in; margin: 0; }
+@media print {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  html, body { width: 13.333in; min-width: 13.333in; background: var(--slide-bg) !important; }
+  body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .presentation-root { width: 13.333in !important; height: auto !important; min-height: 0 !important; overflow: visible !important; }
+  .presentation-root.js { width: 13.333in !important; height: auto !important; min-height: 0 !important; overflow: visible !important; }
+  .presentation-chrome, .slide-progress, .overview-hint { display: none !important; }
+  .slide-deck, .presentation-root.js .slide-deck, .presentation-root.js.is-overview .slide-deck { display: block !important; position: static !important; width: 13.333in !important; height: auto !important; min-height: 0 !important; overflow: visible !important; padding: 0 !important; }
+  .slide, .presentation-root.js .slide, .presentation-root.js.is-overview .slide { display: block !important; position: relative !important; inset: auto !important; top: auto !important; left: auto !important; right: auto !important; bottom: auto !important; margin: 0 !important; width: 13.333in !important; height: 7.5in !important; min-height: 0; visibility: visible !important; transform: none !important; break-after: page; page-break-after: always; overflow: hidden !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; cursor: default !important; }
+  .slide:last-child { break-after: auto; page-break-after: auto; }
+  .slide-content, .presentation-root.js.is-overview .slide-content { width: 1920px !important; height: 1080px !important; transform: scale(0.66665) !important; transform-origin: top left; }
+  .code-window .line, .terminal-window .tline { opacity: 1 !important; }
+}

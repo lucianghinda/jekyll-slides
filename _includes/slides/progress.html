@@ -1,0 +1,3 @@
+{% if page.slides_progress %}
+  <progress class="slide-progress" data-slide-progress max="{{ page.slides_count | escape }}" value="1" aria-label="Slide progress">1 / {{ page.slides_count | escape }}</progress>
+{% endif %}
