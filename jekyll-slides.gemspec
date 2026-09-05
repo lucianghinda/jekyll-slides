@@ -26,6 +26,9 @@ Gem::Specification.new do |spec|
       "_layouts/**/*",
       "assets/**/*",
       "lib/**/*.rb",
+      "doc/**/*.md",
+      "doc/**/*.csv",
+      "llm.txt",
       "LICENSE.txt",
       "CHANGELOG.md",
       "README.md"

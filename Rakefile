@@ -1,8 +1,10 @@
 # frozen_string_literal: true
 
 require "rake"
+require "fileutils"
 require "rubocop/rake_task"
 require "tmpdir"
+require "yard"
 
 ROOT = File.expand_path(__dir__)
 RUBY = RbConfig.ruby
@@ -52,6 +54,15 @@ task :example do
 end
 
 RuboCop::RakeTask.new(:rubocop)
+
+YARD::Rake::YardocTask.new do |task|
+  task.before = -> { FileUtils.rm_rf(File.join(ROOT, "doc")) }
+end
+
+desc "Generate Markdown API documentation and the LLM index"
+task docs: :yard do
+  sh RUBY, File.join(ROOT, "bin/generate_llm.rb")
+end
 
 desc "Run all Ruby, JavaScript, CSS, package, and installed-gem verification once"
 task default: ["rubocop", "test", "js", "css:test", "gem:verify", "example"]

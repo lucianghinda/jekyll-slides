@@ -11,14 +11,20 @@ From the repository root:
 ```sh
 bundle install
 npm ci
-bundle exec rake
+bin/prepare_release
 git diff --check
-mkdir -p pkg
-bundle exec gem build jekyll-slides.gemspec --strict --output pkg/jekyll-slides-0.1.0.gem
-shasum -a 256 pkg/jekyll-slides-0.1.0.gem
 ```
 
-Use the matching filename when releasing another version. The complete Rake
+`bin/prepare_release` runs the complete Rake verification, replaces the generated
+Markdown API docs using YARD, updates their index and `llm.txt`, then performs a
+strict gem build. It writes `pkg/jekyll-slides-VERSION.gem` and a matching
+`.gem.sha256` file using the version from the gemspec. It works from any current
+directory and stops at the first failure. It never commits, tags, pushes, or
+publishes.
+
+To regenerate only documentation, run `bundle exec rake docs`. Review and commit
+the generated `doc/` and `llm.txt` files with their source changes. `doc/` is
+generated output; put authored guides in `docs/` instead. The complete Rake
 check includes lint, Ruby and browser-runtime tests, CSS reproducibility, strict
 gem validation, archive inspection, and a fresh-process Jekyll build using the
 installed gem. CI tests Ruby 3.1 against Jekyll 4.3 and the latest allowed
@@ -27,9 +33,9 @@ relies on standard-library gems removed from Ruby 3.4 and is not a supported
 combination with Ruby 3.4 or newer.
 
 The archive should contain Ruby code, layouts, includes, compiled assets, bundled
-fonts and their OFL notices, the Apache license, README, and changelog. Development
-files and example decks stay in the source repository. Consumers do not need
-Node or a CSS build step.
+fonts and their OFL notices, generated Markdown API docs, `llm.txt`, the Apache
+license, README, and changelog. Development scripts and example decks stay in
+the source repository. Consumers do not need Node, YARD, or a CSS build step.
 
 Review the dark and light example decks, code focus/scrolling, overview, and PDF
 output when presentation assets change. Dense examples need splitting for print.

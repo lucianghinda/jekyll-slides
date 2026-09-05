@@ -75,6 +75,16 @@ class PackageTest < Minitest::Test
     end
   end
 
+  def test_generated_documentation_is_shipped_without_release_tools
+    %w[llm.txt doc/Jekyll/Slides.md doc/Jekyll/Slides/Presentation.md].each do |path|
+      assert_includes @spec.files, path
+      assert File.file?(File.join(ROOT, path)), "missing generated documentation #{path}"
+    end
+    refute_includes @spec.files, "bin/prepare_release"
+    refute_includes @spec.files, "bin/generate_llm.rb"
+    refute(@spec.runtime_dependencies.any? { |dependency| %w[yard yard-markdown].include?(dependency.name) })
+  end
+
   def test_bundled_fonts_are_shipped_with_their_licenses_and_provenance
     %w[next mono].each do |family|
       %w[normal italic].each do |style|
