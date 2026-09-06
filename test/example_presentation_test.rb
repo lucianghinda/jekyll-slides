@@ -49,6 +49,8 @@ class ExamplePresentationTest < Minitest::Test
       refute_includes output, "{%"
       refute_includes output, "@apply"
       refute_includes output, "class=\"highlighter-rouge\""
+      assert_no_leaked_slide_files(destination)
+      assert_slides_in_filename_order(output)
       assert File.file?(File.join(destination, "assets/css/presentation.css"))
       assert File.file?(File.join(destination, "assets/js/presentation.js"))
       assert_installed_fonts(destination)
@@ -63,6 +65,25 @@ class ExamplePresentationTest < Minitest::Test
   end
 
   private
+
+  def assert_no_leaked_slide_files(destination)
+    beautiful_ruby_output = File.join(destination, "beautiful-ruby")
+    leaked_markdown = Dir.glob(File.join(beautiful_ruby_output, "**", "*.md"))
+    assert_empty leaked_markdown, "slide files leaked into output as copied Markdown: #{leaked_markdown.join(', ')}"
+
+    leaked_html = Dir.glob(File.join(beautiful_ruby_output, "*.html")).reject { |path| File.basename(path) == "index.html" }
+    assert_empty leaked_html, "slide files leaked into output as standalone HTML: #{leaked_html.join(', ')}"
+  end
+
+  def assert_slides_in_filename_order(output)
+    first_slide = output[0...output.index('id="slide-2"')]
+    assert_includes first_slide, "Beautiful Ruby", "expected 01-title.md content in slide 1"
+    assert_includes first_slide, "A refactoring story in ten small moves", "expected 01-title.md content in slide 1"
+
+    last_slide = output[output.index('id="slide-10"')..]
+    assert_includes last_slide, "Three habits to keep", "expected 10-three-habits.md content in slide 10"
+    assert_includes last_slide, "Small, legible changes compound into beautiful Ruby.", "expected 10-three-habits.md content in slide 10"
+  end
 
   def assert_installed_fonts(destination)
     %w[next mono].each do |family|

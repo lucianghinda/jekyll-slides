@@ -35,6 +35,12 @@ Returns the value of attribute values.
 ### `parse(content, index: = 0, warning: = nil, components: = nil)` <a id="method-c-parse"></a> <a id="parse-class_method"></a>
 Not documented.
 
+### `split_comment(body, warning: = nil)` <a id="method-c-split_comment"></a> <a id="split_comment-class_method"></a>
+Parses a leading "<!-- key: value -->" metadata comment off `body`. Returns
+[body_without_comment, values]. A comment whose lines are not all "key:
+value", or that carries no recognized key, is left in the body untouched.
+Unknown keys warn only when `warning` is given.
+
 ## Public Instance Methods
 ### `initialize(content, index: = 0, warning: = nil)` <a id="method-i-initialize"></a> <a id="initialize-instance_method"></a>
 - **@return** [SlideMetadata] a new instance of SlideMetadata

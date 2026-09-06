@@ -2,7 +2,7 @@
 
 |  |  |
 | --- | --- |
-| **Defined in** | lib/jekyll/slides.rb, lib/jekyll/slides/assets.rb, lib/jekyll/slides/layout.rb, lib/jekyll/slides/support.rb, lib/jekyll/slides/version.rb, lib/jekyll/slides/renderer.rb, lib/jekyll/slides/presentation.rb, lib/jekyll/slides/range_parser.rb, lib/jekyll/slides/rouge_renderer.rb, lib/jekyll/slides/slide_metadata.rb, lib/jekyll/slides/slide_renderer.rb, lib/jekyll/slides/component_renderer.rb, lib/jekyll/slides/jekyll_integration.rb, lib/jekyll/slides/presentation_parser.rb |
+| **Defined in** | lib/jekyll/slides.rb, lib/jekyll/slides/deck.rb, lib/jekyll/slides/assets.rb, lib/jekyll/slides/layout.rb, lib/jekyll/slides/support.rb, lib/jekyll/slides/version.rb, lib/jekyll/slides/renderer.rb, lib/jekyll/slides/slide_file.rb, lib/jekyll/slides/front_matter.rb, lib/jekyll/slides/presentation.rb, lib/jekyll/slides/range_parser.rb, lib/jekyll/slides/deck_assembler.rb, lib/jekyll/slides/rouge_renderer.rb, lib/jekyll/slides/slide_metadata.rb, lib/jekyll/slides/slide_renderer.rb, lib/jekyll/slides/component_renderer.rb, lib/jekyll/slides/jekyll_integration.rb, lib/jekyll/slides/presentation_parser.rb |
 
 Markdown presentations for Jekyll, with editor and terminal components.
 
@@ -38,6 +38,9 @@ Not documented.
 - [Slides/Assets.md](doc/Jekyll/Slides/Assets.md)
 - [Slides/ComponentRenderer/RenderedDocument.md](doc/Jekyll/Slides/ComponentRenderer/RenderedDocument.md)
 - [Slides/ComponentRenderer.md](doc/Jekyll/Slides/ComponentRenderer.md)
+- [Slides/Deck.md](doc/Jekyll/Slides/Deck.md)
+- [Slides/DeckAssembler.md](doc/Jekyll/Slides/DeckAssembler.md)
+- [Slides/FrontMatter.md](doc/Jekyll/Slides/FrontMatter.md)
 - [Slides/JekyllIntegration.md](doc/Jekyll/Slides/JekyllIntegration.md)
 - [Slides/Layout.md](doc/Jekyll/Slides/Layout.md)
 - [Slides/Presentation.md](doc/Jekyll/Slides/Presentation.md)
@@ -45,6 +48,7 @@ Not documented.
 - [Slides/RangeParser.md](doc/Jekyll/Slides/RangeParser.md)
 - [Slides/Renderer.md](doc/Jekyll/Slides/Renderer.md)
 - [Slides/RougeRenderer.md](doc/Jekyll/Slides/RougeRenderer.md)
+- [Slides/SlideFile.md](doc/Jekyll/Slides/SlideFile.md)
 - [Slides/SlideMetadata.md](doc/Jekyll/Slides/SlideMetadata.md)
 - [Slides/SlideRenderer.md](doc/Jekyll/Slides/SlideRenderer.md)
 - [Slides/Support.md](doc/Jekyll/Slides/Support.md)

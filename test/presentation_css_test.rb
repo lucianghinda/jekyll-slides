@@ -72,6 +72,43 @@ class PresentationCssTest < Minitest::Test
     refute_match(/addEventListener\("resize"/, javascript)
   end
 
+  def test_abs_corrects_the_safari_atan2_sign_bug_when_supported
+    abs_supports = /@supports\s*\(transform:\s*scale\(abs\(-1\)\)\)/
+    slide_scale_abs = /min\(\s*abs\(tan\(atan2\(100cqw,\s*1920px\)\)\)\s*,\s*abs\(tan\(atan2\(100cqh,\s*1080px\)\)\)\s*\)/
+    overview_scale_abs = /abs\(tan\(atan2\(100cqw,\s*1920px\)\)\)/
+
+    assert_match(/#{abs_supports}\s*\{[^}]*\.presentation-root\.js \.slide\s*\{[^}]*--slide-scale:\s*#{slide_scale_abs}/m, source)
+    assert_match(/#{abs_supports}\s*\{[^}]*--overview-slide-scale:\s*#{overview_scale_abs}/m, source)
+
+    abs_blocks = source.scan(/@supports\s*\(transform:\s*scale\(abs\(-1\)\)\)\s*\{(.*?)\n\}/m).flatten
+    assert_equal 2, abs_blocks.size
+    abs_blocks.each { |block| refute_match(/transform:/, block) }
+  end
+
+  def test_abs_override_wins_the_cascade_in_the_compiled_stylesheet
+    built = File.read(BUILT_CSS)
+
+    abs_supports_offsets = built.enum_for(:scan, /@supports\s*\(transform:\s*scale\(abs\(-1\)\)\)/).map { Regexp.last_match.begin(0) }
+    slide_scale_offsets = built.enum_for(:scan, "--slide-scale:").map { Regexp.last_match.begin(0) }
+    overview_scale_offsets = built.enum_for(:scan, "--overview-slide-scale:").map { Regexp.last_match.begin(0) }
+
+    assert_equal 2, abs_supports_offsets.size
+    assert_equal 2, slide_scale_offsets.size
+    assert_equal 2, overview_scale_offsets.size
+
+    assert_operator slide_scale_offsets.first, :<, slide_scale_offsets.last
+    assert_operator overview_scale_offsets.first, :<, overview_scale_offsets.last
+
+    assert(
+      abs_supports_offsets.any? { |offset| offset.between?(slide_scale_offsets.first, slide_scale_offsets.last) },
+      "expected the abs() @supports block to sit between the two --slide-scale declarations"
+    )
+    assert(
+      abs_supports_offsets.any? { |offset| offset.between?(overview_scale_offsets.first, overview_scale_offsets.last) },
+      "expected the abs() @supports block to sit between the two --overview-slide-scale declarations"
+    )
+  end
+
   def test_code_only_layout_and_chrome_do_not_compete_with_slide_content
     assert_match(/\.layout-code \.slide-content\s*\{[^}]*justify-content:\s*center/m, source)
     assert_match(/\.presentation-chrome\s*\{[^}]*pointer-events:\s*none/m, source)
