@@ -26,8 +26,12 @@ end
 
 require_relative "slides/version"
 require_relative "slides/support"
+require_relative "slides/front_matter"
 require_relative "slides/presentation_parser"
 require_relative "slides/slide_metadata"
+require_relative "slides/slide_file"
+require_relative "slides/deck"
+require_relative "slides/deck_assembler"
 require_relative "slides/range_parser"
 require_relative "slides/rouge_renderer"
 require_relative "slides/component_renderer"

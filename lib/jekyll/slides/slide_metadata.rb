@@ -13,6 +13,31 @@ module Jekyll
         new(content, index: index, warning: warning).parse(components: components)
       end
 
+      # Parses a leading "<!-- key: value -->" metadata comment off +body+.
+      # Returns [body_without_comment, values]. A comment whose lines are not
+      # all "key: value", or that carries no recognized key, is left in the
+      # body untouched. Unknown keys warn only when +warning+ is given.
+      def self.split_comment(body, warning: nil)
+        match = body.match(/\A[ \t]*(<!--(.*?)-->)[ \t]*(?:\r?\n)?/m)
+        return [body, {}] unless match
+
+        values = {}
+        lines = match[2].to_s.lines.map(&:strip).reject(&:empty?)
+        parsed = lines.map { |line| line.match(/\A(\w[\w-]*)\s*:\s*(.*?)\z/) }
+        return [body, {}] unless parsed.all?
+        return [body, {}] unless parsed.any? { |match_data| KEYS.include?(match_data[1]) }
+
+        parsed.each do |match_data|
+          key = match_data[1]
+          if KEYS.include?(key)
+            values[key] = match_data[2].strip
+          else
+            Support.warn(warning, "Unknown slide metadata key #{key.inspect}; ignoring")
+          end
+        end
+        [body[match.end(0)..].to_s, values]
+      end
+
       def initialize(content, index: 0, warning: nil)
         @original_content = content.to_s
         @index = index
@@ -40,24 +65,7 @@ module Jekyll
       private
 
       def extract_comment(body)
-        match = body.match(/\A[ \t]*(<!--(.*?)-->)[ \t]*(?:\r?\n)?/m)
-        return [body, {}] unless match
-
-        values = {}
-        lines = match[2].to_s.lines.map(&:strip).reject(&:empty?)
-        parsed = lines.map { |line| line.match(/\A(\w[\w-]*)\s*:\s*(.*?)\z/) }
-        return [body, {}] unless parsed.all?
-        return [body, {}] unless parsed.any? { |match_data| KEYS.include?(match_data[1]) }
-
-        parsed.each do |match_data|
-          key = match_data[1]
-          if KEYS.include?(key)
-            values[key] = match_data[2].strip
-          else
-            Support.warn(@warning, "Unknown slide metadata key #{key.inspect}; ignoring")
-          end
-        end
-        [body[match.end(0)..].to_s, values]
+        self.class.split_comment(body, warning: @warning)
       end
 
       def inferred_layout(components)

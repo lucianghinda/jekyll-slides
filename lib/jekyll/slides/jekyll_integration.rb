@@ -29,6 +29,7 @@ module Jekyll
 
         def process_site(site)
           install_resources(site)
+          DeckAssembler.assemble(site)
           presentation_documents(site).each { |document| process(document) }
         end
 

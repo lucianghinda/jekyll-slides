@@ -2,7 +2,7 @@
 
 |  |  |
 | --- | --- |
-| **Defined in** | lib/jekyll/slides.rb, lib/jekyll/slides/assets.rb, lib/jekyll/slides/layout.rb, lib/jekyll/slides/support.rb, lib/jekyll/slides/version.rb, lib/jekyll/slides/renderer.rb, lib/jekyll/slides/presentation.rb, lib/jekyll/slides/range_parser.rb, lib/jekyll/slides/rouge_renderer.rb, lib/jekyll/slides/slide_metadata.rb, lib/jekyll/slides/slide_renderer.rb, lib/jekyll/slides/component_renderer.rb, lib/jekyll/slides/jekyll_integration.rb, lib/jekyll/slides/presentation_parser.rb |
+| **Defined in** | lib/jekyll/slides.rb, lib/jekyll/slides/deck.rb, lib/jekyll/slides/assets.rb, lib/jekyll/slides/layout.rb, lib/jekyll/slides/support.rb, lib/jekyll/slides/version.rb, lib/jekyll/slides/renderer.rb, lib/jekyll/slides/slide_file.rb, lib/jekyll/slides/front_matter.rb, lib/jekyll/slides/presentation.rb, lib/jekyll/slides/range_parser.rb, lib/jekyll/slides/deck_assembler.rb, lib/jekyll/slides/rouge_renderer.rb, lib/jekyll/slides/slide_metadata.rb, lib/jekyll/slides/slide_renderer.rb, lib/jekyll/slides/component_renderer.rb, lib/jekyll/slides/jekyll_integration.rb, lib/jekyll/slides/presentation_parser.rb |
 
 Markdown presentations for Jekyll, with editor and terminal components.
 
@@ -38,6 +38,9 @@ Not documented.
 - [Slides/Assets.md](Slides/Assets.md)
 - [Slides/ComponentRenderer/RenderedDocument.md](Slides/ComponentRenderer/RenderedDocument.md)
 - [Slides/ComponentRenderer.md](Slides/ComponentRenderer.md)
+- [Slides/Deck.md](Slides/Deck.md)
+- [Slides/DeckAssembler.md](Slides/DeckAssembler.md)
+- [Slides/FrontMatter.md](Slides/FrontMatter.md)
 - [Slides/JekyllIntegration.md](Slides/JekyllIntegration.md)
 - [Slides/Layout.md](Slides/Layout.md)
 - [Slides/Presentation.md](Slides/Presentation.md)
@@ -45,6 +48,7 @@ Not documented.
 - [Slides/RangeParser.md](Slides/RangeParser.md)
 - [Slides/Renderer.md](Slides/Renderer.md)
 - [Slides/RougeRenderer.md](Slides/RougeRenderer.md)
+- [Slides/SlideFile.md](Slides/SlideFile.md)
 - [Slides/SlideMetadata.md](Slides/SlideMetadata.md)
 - [Slides/SlideRenderer.md](Slides/SlideRenderer.md)
 - [Slides/Support.md](Slides/Support.md)

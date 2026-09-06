@@ -59,6 +59,62 @@ class: keynote
 -->
 ```
 
+## Deck folders
+
+A deck can also be a folder of Markdown files, one file per slide, instead of one file with `---` separators:
+
+```
+talks/my-talk/
+  index.md          # deck front matter, opts in with `slides: true`
+  01-title.md
+  02-the-idea.md
+  03-code.md
+  diagram.png        # ordinary static file, untouched
+```
+
+The entry file must be named `index.md` and carry the deck's front matter, `layout: presentation`, and `slides: true`:
+
+```yaml
+# talks/my-talk/index.md
+---
+layout: presentation
+title: My talk
+slides: true
+---
+```
+
+`slides: true` discovers every other Markdown file that is a direct child of the folder (not recursive), skipping names starting with `_` or `.`, and skipping anything Jekyll itself withholds: a file dropped by the site's `exclude:` setting, or one whose front matter sets `published: false`. Naming a withheld file in an explicit list warns and skips it too, so a deck never publishes content the site holds back. Files are ordered by a natural sort of the filename: digit runs compare numerically and sort before letters, so `01-title.md`, `02-the-idea.md`, `10-outro.md`, then any file with no numeric prefix, sorted alphabetically. Each file holds one slide, or several separated by `---`, exactly as in a single-file deck. Body content in `index.md`, if any, becomes the deck's leading slides.
+
+A slide file can carry its own YAML front matter with `layout`, `background`, and `class`, as an alternative to the `<!-- ... -->` comment:
+
+```markdown
+---
+layout: statement
+background: spotlight
+---
+# A bold claim
+```
+
+Front matter in the file applies to every slide it holds; a slide's own comment overrides it key by key.
+
+Set `slides:` to a list instead of `true` to turn the entry file into a readable running order, in presentation order:
+
+```yaml
+---
+layout: presentation
+title: My talk
+slides:
+  - 01-title.md
+  - 02-the-idea.md
+  # - 03-detour.md
+  - 04-code.md
+---
+```
+
+Cutting a slide for a shorter time slot is commenting out one line, not moving a file out of the folder.
+
+`slides:` is what opts a folder in. Opting in absorbs the whole folder: every Markdown file it absorbs is removed from the site's pages, collection documents, and static files, so none of them is ever published on its own. This holds even for a file commented out of an explicit list; the list controls order and inclusion in the deck, not what gets absorbed. Without `slides:`, a folder holding an `index.md` presentation behaves exactly as it does today, and sibling files are left alone. This matters if the site applies `layout: presentation` through a broad `defaults:` rule, since that alone never triggers absorption.
+
 ## Editors and terminals
 
 Put a kramdown inline attribute list immediately after a fenced block. Attribute values must be quoted; class and ID tokens such as `.editor` and `#order-total` do not need quotes. `.editor` renders a syntax-highlighted editor window; `.terminal` renders a terminal window.
