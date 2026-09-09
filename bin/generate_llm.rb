@@ -36,8 +36,9 @@ class LlmGenerator
     File.join(root, MAIN_DOCUMENT)
   end
 
+  # Every namespace YARD documented for this gem, not only the main module tree.
   def documentation_files
-    Dir.glob(File.join(root, "doc", "Jekyll", "Slides", "**", "*.md"))
+    Dir.glob(File.join(root, File.dirname(MAIN_DOCUMENT), "**", "*.md")) - [main_document]
   end
 
   def documentation_links
