@@ -22,7 +22,7 @@ class LlmGeneratorTest < Minitest::Test
   def test_missing_main_document_fails_without_writing_output
     refute @generator.call
     assert_includes @stderr.string, "Missing #{@root}/doc/Jekyll/Slides.md"
-    refute_path_exists File.join(@root, "llm.txt")
+    refute_path_exists File.join(@root, "llms.txt")
   end
 
   def test_sorted_nested_documentation_links_are_relative_to_each_output
@@ -35,7 +35,7 @@ class LlmGeneratorTest < Minitest::Test
     main = read("doc/Jekyll/Slides.md")
     assert_equal %w[Slides/Assets.md Slides/Parser/Node.md Slides/Renderer.md], main.scan(/^- \[([^\]]+)\]/).flatten
     assert_includes main, "[Slides/Parser/Node.md](Slides/Parser/Node.md)"
-    assert_includes read("llm.txt"), "[Slides/Parser/Node.md](doc/Jekyll/Slides/Parser/Node.md)"
+    assert_includes read("llms.txt"), "[Slides/Parser/Node.md](doc/Jekyll/Slides/Parser/Node.md)"
     assert_includes @stdout.string, "(3 links)"
   end
 
@@ -71,14 +71,14 @@ class LlmGeneratorTest < Minitest::Test
     write("doc/Jekyll/Slides.md", content)
 
     assert @generator.call
-    llm = read("llm.txt")
-    assert_includes llm, "[Renderer](doc/Jekyll/Slides/Renderer.md#call)"
-    assert_includes llm, "[Sibling](doc/Jekyll/Other.md)"
-    assert_includes llm, "[Parent](doc/Jekyll.md)"
-    assert_includes llm, "[Web](https://example.com/Slides/Renderer.md)"
-    assert_includes llm, "[Anchor](#methods), [Absolute](/guide.md)"
-    assert_includes llm, "Slides/Renderer.md and `[Example](Slides/Renderer.md)`"
-    assert_includes llm, "```markdown\n[Example](Slides/Renderer.md)\n```"
+    llms = read("llms.txt")
+    assert_includes llms, "[Renderer](doc/Jekyll/Slides/Renderer.md#call)"
+    assert_includes llms, "[Sibling](doc/Jekyll/Other.md)"
+    assert_includes llms, "[Parent](doc/Jekyll.md)"
+    assert_includes llms, "[Web](https://example.com/Slides/Renderer.md)"
+    assert_includes llms, "[Anchor](#methods), [Absolute](/guide.md)"
+    assert_includes llms, "Slides/Renderer.md and `[Example](Slides/Renderer.md)`"
+    assert_includes llms, "```markdown\n[Example](Slides/Renderer.md)\n```"
     assert_includes read("doc/Jekyll/Slides.md"), content.rstrip
   end
 
@@ -90,7 +90,7 @@ class LlmGeneratorTest < Minitest::Test
 
     assert_predicate status, :success?, stderr
     assert_includes stdout, "Updated #{@root}/doc/Jekyll/Slides.md"
-    assert File.file?(File.join(@root, "llm.txt"))
+    assert File.file?(File.join(@root, "llms.txt"))
   end
 
   private

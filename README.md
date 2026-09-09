@@ -207,7 +207,7 @@ bundle exec rake docs
 ```
 
 This replaces `doc/` with fresh YARD Markdown, updates the documentation index in
-`doc/Jekyll/Slides.md`, and writes `llm.txt` with links relative to the gem root.
+`doc/Jekyll/Slides.md`, and writes `llms.txt` with links relative to the gem root.
 The generated files are checked in and shipped with the gem. Internal plans,
 temporary files, and Node dependencies are excluded. YARD and `yard-markdown`
 are development tools only.

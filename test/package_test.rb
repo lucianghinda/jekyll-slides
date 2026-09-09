@@ -76,7 +76,7 @@ class PackageTest < Minitest::Test
   end
 
   def test_generated_documentation_is_shipped_without_release_tools
-    %w[llm.txt doc/Jekyll/Slides.md doc/Jekyll/Slides/Presentation.md].each do |path|
+    %w[llms.txt doc/Jekyll/Slides.md doc/Jekyll/Slides/Presentation.md].each do |path|
       assert_includes @spec.files, path
       assert File.file?(File.join(ROOT, path)), "missing generated documentation #{path}"
     end

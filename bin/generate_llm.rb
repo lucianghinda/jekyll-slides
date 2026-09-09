@@ -23,7 +23,7 @@ class LlmGenerator
     content = [content, "# Documentation", documentation_links].join("\n\n").rstrip << "\n"
 
     File.write(main_document, content)
-    File.write(File.join(root, "llm.txt"), root_relative_links(content))
+    File.write(File.join(root, "llms.txt"), root_relative_links(content))
     stdout.puts "Updated #{main_document} (#{documentation_files.size} links)"
     true
   end

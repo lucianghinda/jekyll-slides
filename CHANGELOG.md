@@ -2,6 +2,10 @@
 
 All notable changes to Jekyll Slides are documented here.
 
+## Unreleased
+
+- Rename the generated LLM index from `llm.txt` to `llms.txt`, matching the llmstxt.org convention used across these plugins.
+
 ## 0.2.0 — 2026-09-06
 
 - Add folder decks: author a presentation as one Markdown file per slide, ordered by a numeric filename prefix and alphabetically otherwise, opted into with `slides:` in the entry file's front matter.

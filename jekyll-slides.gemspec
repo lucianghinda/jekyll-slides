@@ -28,7 +28,7 @@ Gem::Specification.new do |spec|
       "lib/**/*.rb",
       "doc/**/*.md",
       "doc/**/*.csv",
-      "llm.txt",
+      "llms.txt",
       "LICENSE.txt",
       "CHANGELOG.md",
       "README.md"

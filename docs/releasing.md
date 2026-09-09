@@ -16,14 +16,14 @@ git diff --check
 ```
 
 `bin/prepare_release` runs the complete Rake verification, replaces the generated
-Markdown API docs using YARD, updates their index and `llm.txt`, then performs a
+Markdown API docs using YARD, updates their index and `llms.txt`, then performs a
 strict gem build. It writes `pkg/jekyll-slides-VERSION.gem` and a matching
 `.gem.sha256` file using the version from the gemspec. It works from any current
 directory and stops at the first failure. It never commits, tags, pushes, or
 publishes.
 
 To regenerate only documentation, run `bundle exec rake docs`. Review and commit
-the generated `doc/` and `llm.txt` files with their source changes. `doc/` is
+the generated `doc/` and `llms.txt` files with their source changes. `doc/` is
 generated output; put authored guides in `docs/` instead. The complete Rake
 check includes lint, Ruby and browser-runtime tests, CSS reproducibility, strict
 gem validation, archive inspection, and a fresh-process Jekyll build using the
@@ -33,7 +33,7 @@ relies on standard-library gems removed from Ruby 3.4 and is not a supported
 combination with Ruby 3.4 or newer.
 
 The archive should contain Ruby code, layouts, includes, compiled assets, bundled
-fonts and their OFL notices, generated Markdown API docs, `llm.txt`, the Apache
+fonts and their OFL notices, generated Markdown API docs, `llms.txt`, the Apache
 license, README, and changelog. Development scripts and example decks stay in
 the source repository. Consumers do not need Node, YARD, or a CSS build step.
 
