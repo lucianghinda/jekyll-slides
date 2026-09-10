@@ -63,14 +63,19 @@ body {
   .presentation-root.js[data-overview-active="false"] .slide:not(.is-active) { visibility: hidden; pointer-events: none; }
 }
 
-/* Safari computes atan2() of two lengths with the wrong sign, so --slide-scale
-   comes out negative and slides render upside down (scale() of a negative
-   number is a 180deg rotation). abs() corrects the sign; Chrome and Firefox
-   already produce a positive ratio, so this is a no-op there. Fold this back
-   into the block above once abs() is a safe baseline next to atan2(). */
+/* Keep the sign correction for browsers without typed division. It cannot
+   correct Safari's inaccurate trigonometric magnitude; prefer division below. */
 @supports (transform: scale(abs(-1))) {
   .presentation-root.js .slide {
     --slide-scale: min(abs(tan(atan2(100cqw, 1920px))), abs(tan(atan2(100cqh, 1080px))));
+  }
+}
+
+/* Safari can compute tan(atan2(length, length)) with the wrong magnitude.
+   Divide lengths directly where supported, after the legacy sign override. */
+@supports (transform: scale(calc(1px / 1px))) {
+  .presentation-root.js .slide {
+    --slide-scale: min(calc(100cqw / 1920px), calc(100cqh / 1080px));
   }
 }
 

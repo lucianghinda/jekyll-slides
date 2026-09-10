@@ -164,7 +164,7 @@ class PresentationCssTest < Minitest::Test
     abs_blocks.each { |block| refute_match(/transform:/, block) }
   end
 
-  def test_abs_override_wins_the_cascade_in_the_compiled_stylesheet
+  def test_abs_override_follows_the_legacy_formula_in_the_compiled_stylesheet
     built = File.read(BUILT_CSS)
 
     abs_supports_offsets = built.enum_for(:scan, /@supports\s*\(transform:\s*scale\(abs\(-1\)\)\)/).map { Regexp.last_match.begin(0) }
@@ -172,20 +172,33 @@ class PresentationCssTest < Minitest::Test
     overview_scale_offsets = built.enum_for(:scan, "--overview-slide-scale:").map { Regexp.last_match.begin(0) }
 
     assert_equal 2, abs_supports_offsets.size
-    assert_equal 2, slide_scale_offsets.size
-    assert_equal 2, overview_scale_offsets.size
+    assert_equal 3, slide_scale_offsets.size
+    assert_equal 3, overview_scale_offsets.size
 
     assert_operator slide_scale_offsets.first, :<, slide_scale_offsets.last
     assert_operator overview_scale_offsets.first, :<, overview_scale_offsets.last
 
     assert(
-      abs_supports_offsets.any? { |offset| offset.between?(slide_scale_offsets.first, slide_scale_offsets.last) },
+      abs_supports_offsets.any? { |offset| offset.between?(slide_scale_offsets.first, slide_scale_offsets[1]) },
       "expected the abs() @supports block to sit between the two --slide-scale declarations"
     )
     assert(
-      abs_supports_offsets.any? { |offset| offset.between?(overview_scale_offsets.first, overview_scale_offsets.last) },
+      abs_supports_offsets.any? { |offset| offset.between?(overview_scale_offsets.first, overview_scale_offsets[1]) },
       "expected the abs() @supports block to sit between the two --overview-slide-scale declarations"
     )
+  end
+
+  def test_direct_length_division_overrides_trigonometry_when_supported
+    [source, File.read(BUILT_CSS)].each do |css|
+      support = css.index(%r{@supports\s*\(transform:\s*scale\(calc\(1px\s*/\s*1px\)\)\)})
+      refute_nil support, "direct division must be feature detected"
+      slide = css.rindex("--slide-scale:")
+      overview = css.rindex("--overview-slide-scale:")
+      assert_operator slide, :>, support
+      assert_operator overview, :>, support
+      assert_match(%r{--slide-scale:\s*min\(calc\(100cqw\s*/\s*1920px\),\s*calc\(100cqh\s*/\s*1080px\)\)}, css)
+      assert_match(%r{--overview-slide-scale:\s*calc\(100cqw\s*/\s*1920px\)}, css)
+    end
   end
 
   def test_code_only_layout_and_chrome_do_not_compete_with_slide_content

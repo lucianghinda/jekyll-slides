@@ -81,13 +81,15 @@
   .presentation-root.js .fragment:not(.is-revealed) { visibility: hidden; opacity: 0; transform: translateY(6px); }
 }
 
-/* Safari computes atan2() of two lengths with the wrong sign, so
-   --overview-slide-scale comes out negative and overview thumbnails render
-   upside down. abs() corrects the sign; Chrome and Firefox already produce a
-   positive ratio, so this is a no-op there. Fold this back into the block
-   above once abs() is a safe baseline next to atan2(). */
+/* Legacy sign correction; direct division below also fixes the magnitude. */
 @supports (transform: scale(abs(-1))) {
   .presentation-root.js.is-overview .slide-content, .presentation-root.js[data-overview-active="true"] .slide-content {
     --overview-slide-scale: abs(tan(atan2(100cqw, 1920px)));
+  }
+}
+
+@supports (transform: scale(calc(1px / 1px))) {
+  .presentation-root.js.is-overview .slide-content, .presentation-root.js[data-overview-active="true"] .slide-content {
+    --overview-slide-scale: calc(100cqw / 1920px);
   }
 }

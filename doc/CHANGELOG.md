@@ -2,6 +2,10 @@
 
 All notable changes to Jekyll Slides are documented here.
 
+## 0.5.0 — 2026-09-10
+
+- Fix Safari rendering slides too small or too large, including overview thumbnails. Prefer direct CSS length division when supported; the earlier absolute-value workaround corrected the sign but not the scale's magnitude. Older browsers retain the existing fallback.
+
 ## 0.4.0 — 2026-09-10
 
 - Add opt-in paragraph reveals: mark a paragraph `{: .fragment}` and it is held back until the next step. Forward steps (`ArrowRight`, `PageDown`, `Space`, the next button, or a click on the slide) reveal one paragraph before moving to the next slide; backward steps hide the most recent reveal first. Slide numbers, the progress bar, the URL hash, and browser history keep counting slides, not reveals. Hidden paragraphs keep their space, cannot be focused or reached by assistive technology, and fade in over 180ms unless the reader prefers reduced motion. The overview, print, no-JavaScript output, and browsers without the slide canvas show every paragraph.
