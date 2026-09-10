@@ -21,13 +21,19 @@ module Jekyll
     ROOT = File.expand_path("../..", __dir__)
     LAYOUT_NAME = "presentation"
 
-    # Every theme name the plugin ships. A theme sets the whole deck through
+    # Every deck palette the plugin ships. A theme sets the whole deck through
     # front matter, and any one of them also restyles a single editor or
     # terminal block through that block's +theme+ attribute.
     THEMES = %w[
       minimal-light minimal-dark midnight ruby
       catppuccin-latte catppuccin-frappe catppuccin-macchiato catppuccin-mocha
     ].freeze
+
+    # Every palette a single editor or terminal block may carry: the deck
+    # palettes plus the ones that exist only at window scale. +macos-light+ is
+    # a flat light code window meant to sit inside a deck of any color, so it
+    # defines no slide background or type scale and cannot be a deck theme.
+    COMPONENT_THEMES = (THEMES + %w[macos-light]).freeze
     DEFAULT_THEME = "midnight"
   end
 end

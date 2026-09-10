@@ -22,6 +22,12 @@ integration is not needed; it does not evaluate Liquid or wrap the
 presentation layout.
 
 ## Constants
+### `COMPONENT_THEMES` <a id="constant-COMPONENT_THEMES"></a> <a id="COMPONENT_THEMES-constant"></a>
+Every palette a single editor or terminal block may carry: the deck palettes
+plus the ones that exist only at window scale. <code>macos-light</code> is a
+flat light code window meant to sit inside a deck of any color, so it defines
+no slide background or type scale and cannot be a deck theme.
+
 ### `DEFAULT_THEME` <a id="constant-DEFAULT_THEME"></a> <a id="DEFAULT_THEME-constant"></a>
 Not documented.
 
@@ -32,7 +38,7 @@ Not documented.
 Not documented.
 
 ### `THEMES` <a id="constant-THEMES"></a> <a id="THEMES-constant"></a>
-Every theme name the plugin ships. A theme sets the whole deck through front
+Every deck palette the plugin ships. A theme sets the whole deck through front
 matter, and any one of them also restyles a single editor or terminal block
 through that block's `theme` attribute.
 

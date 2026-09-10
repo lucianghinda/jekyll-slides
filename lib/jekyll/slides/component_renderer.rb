@@ -219,13 +219,15 @@ module Jekyll
       end
 
       # A component may carry any deck theme, so one window can show a light
-      # terminal inside a dark deck. Returns nil to inherit the deck theme.
+      # terminal inside a dark deck, plus the palettes that exist only at window
+      # scale. Returns nil to inherit the deck theme.
       def component_theme(value)
         return nil if value.nil? || value.to_s.empty?
-        return value.to_s if THEMES.include?(value.to_s)
+        return value.to_s if COMPONENT_THEMES.include?(value.to_s)
 
-        Support.warn(@warning, "Unsupported component theme #{value.inspect}; expected one of #{THEMES.join(', ')}; " \
-                               "using the deck theme")
+        Support.warn(@warning,
+                     "Unsupported component theme #{value.inspect}; expected one of #{COMPONENT_THEMES.join(', ')}; " \
+                     "using the deck theme")
         nil
       end
 

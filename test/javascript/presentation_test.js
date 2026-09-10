@@ -63,7 +63,14 @@ class Element {
     if (selector === "[data-overview-hint]") return this.children.find((child) => child.attributes["data-overview-hint"] !== undefined) || null;
     return null;
   }
-  querySelectorAll(selector) { return selector === "[data-slide]" ? this.children : []; }
+  descendants() { return (this.children || []).flatMap((child) => [child, ...child.descendants()]); }
+  querySelectorAll(selector) {
+    if (selector === "[data-slide]") return this.children;
+    if (selector === "p.fragment") {
+      return this.descendants().filter((node) => node.tagName === "P" && node.classList.contains("fragment"));
+    }
+    return [];
+  }
 }
 
 class Document extends Element {
@@ -90,7 +97,7 @@ class Document extends Element {
   getSelection() { return this.selection; }
 }
 
-function fixture({ hash = "", overview = true, fullscreen = true, slideNumbers = true, progress = true, reducedMotion = false, request = "resolve", exit = "resolve", deckWidth = 1920, deckHeight = 1080, slideWidth = 960, viewportWidth = deckWidth, viewportHeight = deckHeight } = {}) {
+function fixture({ hash = "", overview = true, fullscreen = true, slideNumbers = true, progress = true, reducedMotion = false, request = "resolve", exit = "resolve", deckWidth = 1920, deckHeight = 1080, slideWidth = 960, viewportWidth = deckWidth, viewportHeight = deckHeight, fragments = [0, 0, 0] } = {}) {
   const root = new Element("div", {
     "data-presentation-root": "",
     "data-overview": String(overview),
@@ -105,6 +112,17 @@ function fixture({ hash = "", overview = true, fullscreen = true, slideNumbers =
   if (overview) deck.setAttribute("aria-describedby", "slides-overview-hint");
   const slides = [1, 2, 3].map((number) => new Element("section", { "data-slide": String(number), id: `slide-${number}` }));
   slides.forEach((slide) => { slide.clientWidth = slideWidth; });
+  const slideFragments = slides.map((slide, index) => {
+    const content = new Element("div", { class: "slide-content" });
+    content.parentNode = slide;
+    slide.children.push(content);
+    return Array.from({ length: fragments[index] || 0 }, (_value, position) => {
+      const paragraph = new Element("p", { class: "fragment", id: `slide-${index + 1}-fragment-${position + 1}` });
+      paragraph.parentNode = content;
+      content.children.push(paragraph);
+      return paragraph;
+    });
+  });
   deck.children = slides;
   const previous = new Element("button", { "data-slide-previous": "" });
   const next = new Element("button", { "data-slide-next": "" });
@@ -119,7 +137,8 @@ function fixture({ hash = "", overview = true, fullscreen = true, slideNumbers =
   root.parentNode = document;
   root.children.forEach((child) => { child.parentNode = root; });
   deck.children.forEach((slide) => { slide.parentNode = deck; });
-  [root, deck, previous, next, overviewButton, fullscreenButton, counter, progressElement, hint, ...slides].filter(Boolean).forEach((element) => {
+  [root, deck, previous, next, overviewButton, fullscreenButton, counter, progressElement, hint, ...slides,
+    ...slides.flatMap((slide) => slide.descendants())].filter(Boolean).forEach((element) => {
     element.ownerDocument = document;
   });
   const history = { calls: [], replaceState(_state, _title, value) { this.calls.push(["replaceState", value]); window.location.hash = value; }, pushState(_state, _title, value) { this.calls.push(["pushState", value]); window.location.hash = value; } };
@@ -139,7 +158,7 @@ function fixture({ hash = "", overview = true, fullscreen = true, slideNumbers =
     document.fullscreenElement = null; document.dispatch("fullscreenchange");
   };
   window.matchMedia = () => ({ matches: reducedMotion });
-  return { root, deck, slides, previous, next, overviewButton, fullscreenButton, counter, progress: progressElement, hint, document, window, history };
+  return { root, deck, slides, slideFragments, previous, next, overviewButton, fullscreenButton, counter, progress: progressElement, hint, document, window, history };
 }
 
 function key(document, keyName, target, options = {}) {
@@ -710,4 +729,245 @@ test("print lifecycle temporarily exposes every slide without native hidden and 
   assert.equal(view.slides[1].getAttribute("hidden"), null);
   assert.equal(view.slides[0].getAttribute("aria-hidden"), "true");
   assert.equal(view.slides[1].getAttribute("aria-hidden"), "false");
+});
+
+function revealState(view, slideIndex) {
+  return view.slideFragments[slideIndex].map((fragment) => fragment.classList.contains("is-revealed"));
+}
+
+test("forward navigation reveals one paragraph at a time before leaving the slide", () => {
+  for (const advance of ["ArrowRight", " ", "PageDown"]) {
+    const view = fixture({ hash: "#1", fragments: [2, 0, 0] });
+    const controller = runtime.init(view.document, view.window);
+    assert.deepEqual(revealState(view, 0), [false, false], advance);
+
+    key(view.document, advance);
+    assert.equal(controller.current, 1, `${advance} stays on the slide for the first reveal`);
+    assert.deepEqual(revealState(view, 0), [true, false], advance);
+
+    key(view.document, advance);
+    assert.equal(controller.current, 1);
+    assert.deepEqual(revealState(view, 0), [true, true], advance);
+
+    key(view.document, advance);
+    assert.equal(controller.current, 2, `${advance} advances once the slide is exhausted`);
+  }
+});
+
+test("a reveal changes no history entry and no slide counter", () => {
+  const view = fixture({ hash: "#1", fragments: [2, 0, 0] });
+  const controller = runtime.init(view.document, view.window);
+  const before = view.history.calls.length;
+
+  key(view.document, "ArrowRight");
+  assert.equal(view.history.calls.length, before, "revealing pushes no history entry");
+  assert.equal(view.window.location.hash, "#1");
+  assert.equal(view.counter.textContent, "1 / 3", "the counter counts slides, not reveals");
+  assert.equal(view.progress.value, 1);
+
+  key(view.document, "ArrowRight");
+  key(view.document, "ArrowRight");
+  assert.equal(controller.current, 2);
+  assert.deepEqual(view.history.calls.at(-1), ["pushState", "#2"]);
+});
+
+test("backward navigation hides the latest reveal first, then steps back fully revealed", () => {
+  for (const retreat of ["ArrowLeft", "PageUp"]) {
+    const view = fixture({ hash: "#2", fragments: [2, 2, 0] });
+    const controller = runtime.init(view.document, view.window);
+    controller.next();
+    controller.next();
+    assert.deepEqual(revealState(view, 1), [true, true], retreat);
+
+    key(view.document, retreat);
+    assert.equal(controller.current, 2, `${retreat} undoes a reveal before changing slide`);
+    assert.deepEqual(revealState(view, 1), [true, false], retreat);
+
+    key(view.document, retreat);
+    assert.deepEqual(revealState(view, 1), [false, false], retreat);
+
+    key(view.document, retreat);
+    assert.equal(controller.current, 1, `${retreat} leaves the slide once nothing is revealed`);
+    assert.deepEqual(revealState(view, 0), [true, true], "the previous slide arrives fully revealed");
+  }
+});
+
+test("previous and next buttons share the reveal-aware navigation", () => {
+  const view = fixture({ hash: "#1", fragments: [1, 0, 0] });
+  const controller = runtime.init(view.document, view.window);
+
+  view.next.dispatch("click");
+  assert.equal(controller.current, 1);
+  assert.deepEqual(revealState(view, 0), [true]);
+
+  view.previous.dispatch("click");
+  assert.deepEqual(revealState(view, 0), [false]);
+
+  view.next.dispatch("click");
+  view.next.dispatch("click");
+  assert.equal(controller.current, 2);
+});
+
+test("deck boundaries stay actionable while reveals remain", () => {
+  const view = fixture({ hash: "#3", fragments: [0, 0, 2] });
+  const controller = runtime.init(view.document, view.window);
+
+  assert.equal(view.next.disabled, false, "the last slide still has paragraphs to reveal");
+  controller.next();
+  controller.next();
+  assert.equal(view.next.disabled, true, "nothing left to reveal or advance to");
+  assert.equal(view.previous.disabled, false);
+
+  const first = fixture({ hash: "#1", fragments: [1, 0, 0] });
+  const firstController = runtime.init(first.document, first.window);
+  assert.equal(first.previous.disabled, true, "nothing revealed on the first slide");
+  firstController.next();
+  assert.equal(first.previous.disabled, false, "a revealed paragraph can be hidden again");
+});
+
+test("hidden paragraphs are inert and out of the accessibility tree until revealed", () => {
+  const view = fixture({ hash: "#1", fragments: [2, 0, 0] });
+  const controller = runtime.init(view.document, view.window);
+  const [first, second] = view.slideFragments[0];
+
+  assert.equal(first.getAttribute("inert"), "");
+  assert.equal(first.getAttribute("aria-hidden"), "true");
+
+  controller.next();
+  assert.equal(first.getAttribute("inert"), null);
+  assert.equal(first.getAttribute("aria-hidden"), null);
+  assert.equal(second.getAttribute("inert"), "");
+  assert.equal(second.getAttribute("aria-hidden"), "true");
+});
+
+test("rapid repeated advances and retreats clamp at the deck boundaries", () => {
+  const view = fixture({ hash: "#1", fragments: [1, 1, 1] });
+  const controller = runtime.init(view.document, view.window);
+
+  for (let index = 0; index < 20; index += 1) controller.next();
+  assert.equal(controller.current, 3);
+  assert.deepEqual(revealState(view, 2), [true]);
+
+  for (let index = 0; index < 20; index += 1) controller.previous();
+  assert.equal(controller.current, 1);
+  assert.deepEqual(revealState(view, 0), [false]);
+});
+
+test("a slide without fragments advances and retreats normally", () => {
+  const view = fixture({ hash: "#2", fragments: [0, 0, 0] });
+  const controller = runtime.init(view.document, view.window);
+
+  controller.next();
+  assert.equal(controller.current, 3);
+  controller.previous();
+  assert.equal(controller.current, 2);
+});
+
+test("a primary click on noninteractive slide content reveals the next paragraph", () => {
+  const view = fixture({ hash: "#1", fragments: [2, 0, 0] });
+  const controller = runtime.init(view.document, view.window);
+
+  view.slides[0].dispatch("click", { button: 0 });
+  assert.deepEqual(revealState(view, 0), [true, false]);
+
+  view.slides[0].dispatch("click", { button: 0 });
+  view.slides[0].dispatch("click", { button: 0 });
+  assert.equal(controller.current, 2, "the click after the last reveal advances the slide");
+});
+
+test("clicks are ignored for links, modifiers, secondary buttons, prevented events, and selections", () => {
+  const link = new Element("a", { href: "#somewhere" });
+  const view = fixture({ hash: "#1", fragments: [1, 0, 0] });
+  link.parentNode = view.slides[0];
+  link.ownerDocument = view.document;
+  view.slides[0].children.push(link);
+  runtime.init(view.document, view.window);
+
+  link.dispatch("click", { button: 0 });
+  assert.deepEqual(revealState(view, 0), [false], "a link keeps its own behaviour");
+
+  view.slides[0].dispatch("click", { button: 0, metaKey: true });
+  assert.deepEqual(revealState(view, 0), [false], "a modified click is not navigation");
+
+  view.slides[0].dispatch("click", { button: 2 });
+  assert.deepEqual(revealState(view, 0), [false], "a secondary button is not navigation");
+
+  view.slides[0].dispatch("click", { button: 0, defaultPrevented: true });
+  assert.deepEqual(revealState(view, 0), [false], "an already handled click is not navigation");
+
+  view.document.selection = { isCollapsed: false };
+  view.slides[0].dispatch("click", { button: 0 });
+  assert.deepEqual(revealState(view, 0), [false], "selecting text is not navigation");
+
+  view.document.selection = { isCollapsed: true };
+  view.slides[0].dispatch("click", { button: 0 });
+  assert.deepEqual(revealState(view, 0), [true]);
+});
+
+test("a click on an inactive slide never reveals or navigates", () => {
+  const view = fixture({ hash: "#1", fragments: [0, 2, 0] });
+  const controller = runtime.init(view.document, view.window);
+
+  view.slides[1].dispatch("click", { button: 0 });
+  assert.equal(controller.current, 1);
+  assert.deepEqual(revealState(view, 1), [false, false]);
+});
+
+test("overview and print show every paragraph and restore the reveal counts on exit", () => {
+  const view = fixture({ hash: "#1", fragments: [3, 0, 0] });
+  const controller = runtime.init(view.document, view.window);
+  controller.next();
+  assert.deepEqual(revealState(view, 0), [true, false, false]);
+
+  controller.toggleOverview();
+  assert.deepEqual(revealState(view, 0), [true, true, true], "overview shows the whole slide");
+  assert.equal(view.slideFragments[0][2].getAttribute("inert"), null);
+  controller.toggleOverview();
+  assert.deepEqual(revealState(view, 0), [true, false, false], "the reveal count survives overview");
+
+  view.window.dispatch("beforeprint");
+  assert.deepEqual(revealState(view, 0), [true, true, true], "print shows the whole deck");
+  view.window.dispatch("afterprint");
+  assert.deepEqual(revealState(view, 0), [true, false, false], "the reveal count survives print");
+});
+
+test("a reveal count survives leaving and revisiting a slide within the session", () => {
+  const view = fixture({ hash: "#1", fragments: [2, 0, 0] });
+  const controller = runtime.init(view.document, view.window);
+  controller.next();
+  assert.deepEqual(revealState(view, 0), [true, false]);
+
+  controller.goTo(3);
+  controller.goTo(1);
+  assert.deepEqual(revealState(view, 0), [true, false], "coming back keeps what the audience already saw");
+});
+
+test("following an element anchor reveals through the target paragraph", () => {
+  const view = fixture({ hash: "", fragments: [0, 3, 0] });
+  const controller = runtime.init(view.document, view.window);
+
+  view.window.location.hash = "#slide-2-fragment-2";
+  view.window.dispatch("hashchange");
+
+  assert.equal(controller.current, 2);
+  assert.deepEqual(revealState(view, 1), [true, true, false]);
+});
+
+test("a direct hash visit starts the target slide at zero reveals", () => {
+  const view = fixture({ hash: "#2", fragments: [0, 2, 0] });
+  const controller = runtime.init(view.document, view.window);
+
+  assert.equal(controller.current, 2);
+  assert.deepEqual(revealState(view, 1), [false, false]);
+});
+
+test("destroy restores every paragraph so no content is stranded", () => {
+  const view = fixture({ hash: "#1", fragments: [2, 0, 0] });
+  const controller = runtime.init(view.document, view.window);
+  controller.next();
+  controller.destroy();
+
+  assert.deepEqual(revealState(view, 0), [true, true]);
+  assert.equal(view.slideFragments[0][1].getAttribute("inert"), null);
+  assert.equal(view.slideFragments[0][1].getAttribute("aria-hidden"), null);
 });

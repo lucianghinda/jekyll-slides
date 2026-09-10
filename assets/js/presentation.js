@@ -106,6 +106,11 @@
         tabindex: slide.getAttribute && slide.getAttribute("tabindex")
       };
     });
+    // Paragraphs only for now: a wider block vocabulary would need its own
+    // grouping rules, and one marked paragraph is the whole feature.
+    var slideFragments = slides.map(function (slide) {
+      return asArray(slide.querySelectorAll ? slide.querySelectorAll("p.fragment") : []);
+    });
     var total = slides.length || Number(dataValue(root, "slide-count")) || 1;
     var counter = root.querySelector("[data-slide-counter]");
     var progress = root.querySelector("[data-slide-progress]");
@@ -116,7 +121,12 @@
     var overviewHint = root.querySelector("[data-overview-hint]");
     var overviewEnabled = enabled(root, "overview");
     var fullscreenEnabled = enabled(root, "fullscreen");
-    var state = { current: 1, overview: false, printing: false };
+    // How many paragraphs of each slide the audience has already seen. Kept for
+    // the session, so leaving a slide and coming back does not replay it.
+    var state = {
+      current: 1, overview: false, printing: false,
+      revealed: slides.map(function () { return 0; })
+    };
     var listeners = [];
 
     function on(element, eventName, handler, options) {
@@ -198,6 +208,42 @@
         if (slide.removeAttribute) slide.removeAttribute("hidden");
       });
     }
+    function fragmentsOf(number) { return slideFragments[number - 1] || []; }
+    function fragmentCount(number) { return fragmentsOf(number).length; }
+    function revealedCount(number) { return state.revealed[number - 1] || 0; }
+    function setRevealed(number, count) {
+      if (number < 1 || number > total) return;
+      state.revealed[number - 1] = clamp(count, 0, fragmentCount(number));
+    }
+    // Overview, print, and a torn-down runtime all show the whole slide: a
+    // paragraph nobody can reveal must never be a paragraph nobody can read.
+    function updateFragments() {
+      var showEverything = state.overview || state.printing || state.finished;
+      slideFragments.forEach(function (fragments, index) {
+        var visible = showEverything ? fragments.length : (state.revealed[index] || 0);
+        fragments.forEach(function (fragment, position) {
+          if (position < visible) {
+            addClass(fragment, "is-revealed");
+            if (fragment.removeAttribute) { fragment.removeAttribute("inert"); fragment.removeAttribute("aria-hidden"); }
+          } else {
+            removeClass(fragment, "is-revealed");
+            setAttribute(fragment, "inert", "");
+            setAttribute(fragment, "aria-hidden", "true");
+          }
+        });
+      });
+    }
+    // Reveals the paragraphs up to and including the one holding +element+, so
+    // an anchor into a slide lands on visible text.
+    function revealThrough(number, element) {
+      var fragments = fragmentsOf(number);
+      for (var index = fragments.length - 1; index >= 0; index -= 1) {
+        if (contains(fragments[index], element)) {
+          setRevealed(number, Math.max(revealedCount(number), index + 1));
+          return;
+        }
+      }
+    }
     function setPrinting(value) {
       state.printing = Boolean(value);
       if (state.printing) {
@@ -210,12 +256,14 @@
       render();
     }
     function updateIndicators() {
+      // A reveal is a step too, so the deck ends only once the last slide has
+      // nothing left to show, and the first slide can still undo a reveal.
       if (previousButton) {
-        previousButton.disabled = state.current === 1;
+        previousButton.disabled = state.current === 1 && revealedCount(1) === 0;
         setAttribute(previousButton, "aria-disabled", previousButton.disabled ? "true" : "false");
       }
       if (nextButton) {
-        nextButton.disabled = state.current === total;
+        nextButton.disabled = state.current === total && revealedCount(total) === fragmentCount(total);
         setAttribute(nextButton, "aria-disabled", nextButton.disabled ? "true" : "false");
       }
       if (counter) counter.textContent = state.current + " / " + total;
@@ -227,7 +275,30 @@
         progress.style.setProperty("--progress-percent", (state.current / total * 100) + "%");
       }
     }
-    function render() { updateSlideVisibility(); updateIndicators(); updateOverviewButton(); updateOverviewHint(); updateOverviewDescription(); updateFullscreenButton(); }
+    function render() { updateSlideVisibility(); updateFragments(); updateIndicators(); updateOverviewButton(); updateOverviewHint(); updateOverviewDescription(); updateFullscreenButton(); }
+    // One step forward: reveal the next paragraph, or leave the slide once the
+    // slide has nothing left. A reveal is not a location, so it writes no
+    // history entry and does not move the slide counter.
+    function advance() {
+      if (revealedCount(state.current) < fragmentCount(state.current)) {
+        setRevealed(state.current, revealedCount(state.current) + 1);
+        render();
+        return state.current;
+      }
+      return goTo(state.current + 1);
+    }
+    // One step back, undoing the latest reveal first. Stepping onto an earlier
+    // slide arrives with it fully revealed, the way the audience left it.
+    function retreat() {
+      if (revealedCount(state.current) > 0) {
+        setRevealed(state.current, revealedCount(state.current) - 1);
+        render();
+        return state.current;
+      }
+      var destination = state.current - 1;
+      setRevealed(destination, fragmentCount(destination));
+      return goTo(destination);
+    }
     function goTo(number, options) {
       var previous = state.current;
       var validNumber = typeof number === "number" && Number.isFinite(number) && Number.isInteger(number);
@@ -243,7 +314,10 @@
         var target = fragmentTarget(hash);
         if (target) {
           var containingSlide = containingSlideNumber(target);
-          if (containingSlide !== null) state.current = containingSlide;
+          if (containingSlide !== null) {
+            state.current = containingSlide;
+            revealThrough(containingSlide, target);
+          }
           render();
           return state.current;
         }
@@ -303,19 +377,40 @@
       if (key === "Escape" && state.overview) { setOverview(false); if (event.preventDefault) event.preventDefault(); return; }
       if ((key === "o" || key === "O") && overviewEnabled) { toggleOverview(); return; }
       if ((key === "f" || key === "F") && fullscreenEnabled) { toggleFullscreen(); return; }
+      if (key === "ArrowRight" || key === " " || key === "PageDown") {
+        advance();
+        if (event.preventDefault) event.preventDefault();
+        return;
+      }
+      if (key === "ArrowLeft" || key === "PageUp") {
+        retreat();
+        if (event.preventDefault) event.preventDefault();
+        return;
+      }
       var destination;
-      if (key === "ArrowRight" || key === " " || key === "PageDown") destination = state.current + 1;
-      else if (key === "ArrowLeft" || key === "PageUp") destination = state.current - 1;
-      else if (key === "Home") destination = 1;
+      if (key === "Home") destination = 1;
       else if (key === "End") destination = total;
       if (destination === undefined) return;
       goTo(destination);
       if (event.preventDefault) event.preventDefault();
     }
     function selectOverviewSlide(number) { goTo(number); setOverview(false); }
+    // A primary click on the slide itself is the same step as ArrowRight. It
+    // must never steal a link, a selection, or a click something else handled.
+    function contentClickAdvances(event, slide, index) {
+      if (state.printing || index + 1 !== state.current) return false;
+      if (event.defaultPrevented || hasModifier(event)) return false;
+      if (typeof event.button === "number" && event.button !== 0) return false;
+      if (interactiveDescendant(event.target, slide)) return false;
+      return !hasNonCollapsedSelection(document);
+    }
     function bindSlide(slide, index) {
       on(slide, "click", function (event) {
-        if (state.overview && !interactiveDescendant(event.target, slide)) selectOverviewSlide(index + 1);
+        if (state.overview) {
+          if (!interactiveDescendant(event.target, slide)) selectOverviewSlide(index + 1);
+          return;
+        }
+        if (contentClickAdvances(event, slide, index)) advance();
       });
       on(slide, "keydown", function (event) {
         if (!state.overview || event.target !== slide || (keyName(event) !== "Enter" && keyName(event) !== " ")) return;
@@ -335,15 +430,15 @@
     on(window, "beforeprint", function () { setPrinting(true); });
     on(window, "afterprint", function () { setPrinting(false); });
     on(document, "fullscreenchange", updateFullscreenButton);
-    on(previousButton, "click", function () { goTo(state.current - 1); });
-    on(nextButton, "click", function () { goTo(state.current + 1); });
+    on(previousButton, "click", retreat);
+    on(nextButton, "click", advance);
     on(overviewButton, "click", toggleOverview);
     on(fullscreenButton, "click", toggleFullscreen);
     syncFromLocation(true);
     var controller = {
       goTo: goTo,
-      next: function () { return goTo(state.current + 1); },
-      previous: function () { return goTo(state.current - 1); },
+      next: advance,
+      previous: retreat,
       toggleOverview: toggleOverview,
       toggleFullscreen: toggleFullscreen,
       get current() { return state.current; },
@@ -351,6 +446,7 @@
       destroy: function () {
         state.overview = false;
         state.printing = false;
+        state.finished = true;
         removeClass(root, "is-overview");
         removeClass(root, "is-printing");
         if (root.removeAttribute) root.removeAttribute("data-overview-active");

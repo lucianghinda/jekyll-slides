@@ -17,13 +17,21 @@ class ThemeContrastTest < Minitest::Test
       --slide-fg --slide-muted --slide-accent --slide-accent-strong --slide-link
       --slide-code-surface --slide-code-header --slide-code-border --slide-code-shadow
       --slide-code-highlight-surface --slide-code-highlight-border --slide-code-focus-surface
-      --slide-code-inset --slide-surface-shine --slide-highlight --slide-focus
+      --slide-highlight --slide-focus
     ] +
     %w[
       comment keyword string number function operator punctuation
       name variable symbol builtin constant error
     ].map { |token| "--slide-syntax-#{token}" }
   ).freeze
+
+  # A slide background and a type scale belong to the deck, not to one window.
+  DECK_ONLY_TOKENS = %w[
+    --slide-bg --slide-selection --slide-grid-line --slide-spotlight
+    --slide-gradient-start --slide-gradient-end --slide-quote
+    --slide-heading-font-size --slide-title-font-size
+    --slide-body-font-size --slide-statement-font-size
+  ].freeze
 
   THEMES.each do |theme|
     define_method("test_#{theme.tr('-', '_')}_text_contrast_on_every_code_surface") do
@@ -39,7 +47,34 @@ class ThemeContrastTest < Minitest::Test
       assert_empty WINDOW_TOKENS - colors.keys,
                    "[data-code-theme=\"#{theme}\"] must define every window token so one block can be themed alone"
       assert_readable_on_every_code_surface(theme, colors)
+      assert_readable_title_bar(theme, colors)
     end
+  end
+
+  # macos-light is a component-only palette: it repaints one editor or terminal
+  # and nothing around it, so it never appears in THEMES and never carries a
+  # slide background or type scale.
+  def test_macos_light_is_a_complete_window_palette_a_deck_cannot_select
+    colors = code_theme_colors("macos-light")
+
+    assert_empty WINDOW_TOKENS - colors.keys,
+                 '[data-code-theme="macos-light"] must define every window token'
+    assert_readable_on_every_code_surface("macos-light", colors)
+    assert_readable_title_bar("macos-light", colors)
+
+    refute_includes THEMES, "macos-light"
+    assert_empty declarations(%([data-theme="macos-light"])),
+                 "a deck must not be able to select macos-light"
+    assert_empty colors.keys.grep(/\A--slide-dot-/), "macos-light must not repaint the traffic lights"
+    assert_empty colors.keys & DECK_ONLY_TOKENS, "macos-light must not carry deck background or layout values"
+  end
+
+  def test_macos_light_is_a_light_window_with_dark_text
+    colors = code_theme_colors("macos-light")
+
+    assert_operator luminance(rgb(colors.fetch("--slide-code-surface"))), :>, 0.85
+    assert_operator luminance(rgb(colors.fetch("--slide-code-header"))), :>, 0.8
+    assert_operator contrast(rgb(colors.fetch("--slide-fg")), rgb(colors.fetch("--slide-code-surface"))), :>=, 7
   end
 
   def test_minimal_light_is_a_light_surface_with_dark_text
@@ -48,6 +83,19 @@ class ThemeContrastTest < Minitest::Test
     assert_operator luminance(rgb(colors.fetch("--slide-bg"))), :>, 0.8
     assert_operator luminance(rgb(colors.fetch("--slide-fg"))), :<, 0.1
     assert_operator luminance(rgb(colors.fetch("--slide-code-surface"))), :>, 0.7
+  end
+
+  # A flat near-white deck, not the warm paper tint it started as: a projected
+  # slide that leans yellow reads as a colour cast rather than as white.
+  def test_minimal_light_is_neutral_and_near_white
+    colors = theme_colors("minimal-light")
+
+    assert_operator luminance(rgb(colors.fetch("--slide-bg"))), :>, 0.93
+    %w[--slide-bg --slide-code-surface --slide-code-header].each do |token|
+      channels = rgb(colors.fetch(token))
+
+      assert_operator channels.max - channels.min, :<=, 4, "#{token} must stay neutral, not paper-tinted"
+    end
   end
 
   def test_catppuccin_latte_is_the_light_flavor_and_the_rest_are_dark
@@ -87,6 +135,15 @@ class ThemeContrastTest < Minitest::Test
         assert_operator contrast(rgb(color), background), :>=, 4.5, "#{theme} #{token} on #{state}"
       end
     end
+  end
+
+  # The filename and the editor language both sit on the title bar in
+  # --slide-muted, so that pair is its own contrast surface.
+  def assert_readable_title_bar(theme, colors)
+    header = rgb(colors.fetch("--slide-code-header"))
+
+    assert_operator contrast(rgb(colors.fetch("--slide-muted")), header), :>=, 4.5,
+                    "#{theme} title and language on the title bar"
   end
 
   def theme_colors(theme)

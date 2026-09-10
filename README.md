@@ -33,7 +33,7 @@ title: A short talk
 
 <!--
 layout: title
-background: gradient
+background: plain
 -->
 # A short talk
 
@@ -144,6 +144,26 @@ Liquid runs before slide rendering, just as it does on ordinary Jekyll pages. Wr
 
 Code remains selectable and copyable with normal browser controls; version 0.1 does not add a copy button.
 
+## Paragraph reveals
+
+Mark a paragraph `.fragment` to hold it back until the next step. Everything else on the slide is visible from the start.
+
+```markdown
+This paragraph is visible immediately.
+
+This explanation appears on the next click.
+{: .fragment}
+
+This conclusion appears on the following click.
+{: .fragment}
+```
+
+Each forward step — `ArrowRight`, `PageDown`, `Space`, the next button, or a click on the slide — reveals one more marked paragraph. Once the slide has none left, the same step moves to the next slide. Backward steps hide the most recent reveal first, and stepping onto an earlier slide arrives with it fully revealed. Slide numbers, the progress bar, the URL hash, and browser history keep counting slides, not reveals.
+
+A hidden paragraph keeps its space, so revealing one moves nothing else on the slide. It cannot be focused or read by assistive technology until it is revealed, and it fades in over 180ms unless the reader prefers reduced motion. The overview, print output, no-JavaScript output, and browsers without the slide canvas show every paragraph, because none of them can reveal one; leaving the overview or the print dialog restores the reveals for the session.
+
+Reveals are opt-in per paragraph, and version 0.1 marks paragraphs only. The [presentation polish example](https://github.com/lucianghinda/jekyll-slides/blob/main/examples/presentation-polish.md) shows them on a flat light deck.
+
 ## Themes and configuration
 
 Presentation themes are `minimal-light`, `minimal-dark`, `midnight` (the default), `ruby`, and the four Catppuccin flavors `catppuccin-latte`, `catppuccin-frappe`, `catppuccin-macchiato`, and `catppuccin-mocha`. These style the slides without replacing the site's Jekyll theme. Configure defaults under `slides:`:
@@ -178,21 +198,36 @@ ghostty 1.0.1
 
 The override repaints that window completely: surface, title bar, syntax colors, prompt, and body text. Everything outside it keeps the deck theme. An unknown name warns during the build and falls back to the deck theme. The [terminal themes example](https://github.com/lucianghinda/jekyll-slides/blob/main/examples/terminal-themes.md) shows a deck-wide flavor next to per-window overrides.
 
+### The macOS light window
+
+`macos-light` is a component-only palette: a flat near-white code window with a pale title bar, purple keywords, green strings, and blue functions. It is meant to sit inside a deck of any color, so it defines no slide background and no type scale, and a deck cannot select it.
+
+````markdown
+```ruby
+class Invoice
+  def total = items.sum(&:price)
+end
+```
+{: .editor title="app/models/invoice.rb" theme="macos-light" line_numbers="true"}
+````
+
+Because `theme` is one shared attribute, `macos-light` works on a terminal too. Omitting `theme` continues to inherit the deck palette, and naming it in front matter or `_config.yml` is not a deck theme — that warns and falls back like any other unknown deck name. The [editor themes example](https://github.com/lucianghinda/jekyll-slides/blob/main/examples/editor-themes.md) shows it on a dark deck across all three sizes.
+
 ### Window chrome
 
-Editors and terminals render the same macOS-style title bar: traffic lights on the left, the `title` centered in the bar, and for editors the language on the right. The traffic lights keep the macOS red, amber, and green in every theme, the way a real title bar does; only the window surface follows the theme. Bar height, control size, and spacing scale with the component `size`.
+Editors and terminals render the same macOS-style title bar: traffic lights on the left, then the `title`, and for editors the language on the right. The bar is a single flat fill from the palette with a hairline under it; the window has a 1px border and a restrained shadow. The traffic lights keep the macOS red, amber, and green in every theme, the way a real title bar does; only the window surface follows the theme. Bar height, control size, and the title's offset all scale with the component `size`, so `sm`, `md`, and `lg` stay aligned. A long filename truncates before it reaches the language label.
 
 ## Typography and readability
 
 The gem bundles Atkinson Hyperlegible Next for text and Atkinson Hyperlegible Mono for code, including variable upright and italic faces. Fonts load from the site's own assets and work offline. The font files retain their SIL Open Font License; source revisions, checksums, and notices are in [assets/fonts](https://github.com/lucianghinda/jekyll-slides/blob/main/assets/fonts/README.md).
 
-On the 1920×1080 slide canvas, body text is 44px, section headings are 72px, and code sizes `sm`, `md`, and `lg` are 32px, 38px, and 42px. These sizes scale with the slide. Filenames and line numbers remain readable, and focused lines use borders and background color while keeping surrounding code fully visible. All eight themes check syntax-token contrast against normal, highlighted, and focused code surfaces, both deck-wide and as a single-window override.
+On the 1920×1080 slide canvas, body text is 44px, section headings are 72px, and code sizes `sm`, `md`, and `lg` are 32px, 38px, and 42px. These sizes scale with the slide. Filenames and line numbers remain readable, and focused lines use borders and background color while keeping surrounding code fully visible. All eight deck themes, plus the component-only `macos-light`, check syntax-token contrast against normal, highlighted, and focused code surfaces, both deck-wide and as a single-window override, and check the filename and language against the title bar.
 
 Prefer medium or large code and short examples for projection. Long blocks can scroll, but an audience cannot reveal hidden lines independently; split examples when presenting or printing. Screen contrast tests do not replace checking the actual projector and viewing distance.
 
 ## Navigation and accessibility
 
-Use `ArrowLeft`/`ArrowRight`, `PageUp`/`PageDown`, `Home`, and `End` to navigate. `Space` advances, `O` toggles overview, and `F` toggles fullscreen. The current slide is synchronized in the URL hash (`#3` for slide three), so links and browser history work. The controls include accessible labels and focus states; reduced-motion preferences are respected. Print the deck with the browser print dialog (slides are paginated and chrome is hidden). If JavaScript is disabled, all slides remain in document order as complete aspect-ratio frames with readable content.
+Use `ArrowLeft`/`ArrowRight`, `PageUp`/`PageDown`, `Home`, and `End` to navigate. `Space` advances, `O` toggles overview, and `F` toggles fullscreen. A click on the slide advances too; links, buttons, modified clicks, and text selection keep their own behavior. On a slide with [paragraph reveals](#paragraph-reveals), a forward step reveals the next paragraph before it changes slide. `Home` and `End` always jump to a slide. The current slide is synchronized in the URL hash (`#3` for slide three), so links and browser history work. The controls include accessible labels and focus states; reduced-motion preferences are respected. Print the deck with the browser print dialog (slides are paginated and chrome is hidden). If JavaScript is disabled, all slides remain in document order as complete aspect-ratio frames with readable content.
 
 ## Demo and development
 
@@ -249,7 +284,7 @@ Maintainers can follow the [release instructions](https://github.com/lucianghind
 
 ## 0.1 limitations and extension
 
-Version 0.1 intentionally supports Markdown/Kramdown, a fixed 16:9 canvas, the curated layouts/themes above, and a small dependency-free browser runtime. It does not provide speaker notes, transitions, nested slide sections, a theme editor, or an authoring UI. JavaScript is enhancement-only; server-side HTML is the source of truth.
+Version 0.1 intentionally supports Markdown/Kramdown, a fixed 16:9 canvas, the curated layouts/themes above, and a small dependency-free browser runtime. It does not provide speaker notes, slide transitions, nested slide sections, a theme editor, or an authoring UI. Reveals mark paragraphs only; other blocks and grouped sequences are not covered. JavaScript is enhancement-only; server-side HTML is the source of truth.
 
 The plugin injects its `_layouts`, `_includes`, and `assets` into Jekyll without participating in theme resolution. A site can override the `presentation` layout, any `slides/*` include, or either compiled asset by placing a file with the same path in its own source tree. Copy the stylesheet only when you need a complete CSS fork; otherwise add a custom slide class and site CSS after the gem stylesheet. Keep `plugins: [jekyll-slides]` enabled even when overriding the layout so Markdown rendering and normalized slide settings remain active.
 

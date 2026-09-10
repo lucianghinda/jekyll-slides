@@ -102,6 +102,26 @@ class ComponentRendererTest < Minitest::Test
     end
   end
 
+  # macos-light is a component-only palette: a window can carry it, a deck
+  # cannot. The shared title bar is unaffected by the choice.
+  def test_a_single_window_can_carry_a_component_only_theme
+    %w[editor terminal].each do |component|
+      warnings = []
+      html = render("```ruby\nputs 1\n```\n{: .#{component} theme=\"macos-light\" title=\"app.rb\"}", warnings: warnings)
+
+      assert_includes html, 'data-code-theme="macos-light"', component
+      assert_includes html, '<header class="code-window-header">', component
+      assert_includes html, "<figcaption>app.rb</figcaption>", component
+      assert_empty warnings, component
+    end
+  end
+
+  def test_a_deck_theme_list_does_not_gain_the_component_only_theme
+    refute_includes Jekyll::Slides::THEMES, "macos-light"
+    assert_includes Jekyll::Slides::COMPONENT_THEMES, "macos-light"
+    assert_equal Jekyll::Slides::THEMES, Jekyll::Slides::COMPONENT_THEMES - %w[macos-light]
+  end
+
   def test_unknown_component_theme_warns_and_inherits_the_deck_theme
     warnings = []
     html = render("```ruby\nputs 1\n```\n{: .editor theme=\"dracula\"}", warnings: warnings)
