@@ -14,9 +14,6 @@ Not documented.
 ### `OPTION_KEYS` <a id="constant-OPTION_KEYS"></a> <a id="OPTION_KEYS-constant"></a>
 Not documented.
 
-### `THEMES` <a id="constant-THEMES"></a> <a id="THEMES-constant"></a>
-Not documented.
-
 ## Public Class Methods
 ### `install!()` <a id="method-c-install-21"></a> <a id="install!-class_method"></a>
 Not documented.

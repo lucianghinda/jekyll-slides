@@ -7,8 +7,17 @@
   --slide-radius: 28px;
 }
 
-:root, [data-theme="midnight"] {
-  --slide-bg: #10141d;
+/* Window controls keep the macOS traffic-light colors in every theme, the
+   way a real title bar does; only the window surface follows the theme. */
+:root {
+  --slide-dot-close: #ff5f57;
+  --slide-dot-minimize: #febc2e;
+  --slide-dot-maximize: #28c840;
+  --slide-dot-rim: rgba(0, 0, 0, .16);
+  --slide-dot-gloss: rgba(255, 255, 255, .26);
+}
+
+:root, [data-theme="midnight"], [data-code-theme="midnight"] {
   --slide-fg: #f3f5f8;
   --slide-muted: #b4bdca;
   --slide-accent: #ff6b4a;
@@ -32,20 +41,7 @@
   --slide-syntax-error: #ff8675;
   --slide-highlight: rgba(255, 107, 74, .17);
   --slide-focus: #ff9e7a;
-  --slide-selection: rgba(255, 107, 74, .28);
-  --slide-grid-line: rgba(255, 255, 255, .055);
-  --slide-spotlight: rgba(255, 107, 74, .15);
-  --slide-gradient-start: #191d2c;
-  --slide-gradient-end: #10141d;
   --slide-link: #9edbea;
-  --slide-quote: #c8d1dc;
-  --slide-dot-close: #ef806d;
-  --slide-dot-minimize: #e6b566;
-  --slide-dot-maximize: #87c899;
-  --slide-heading-font-size: 72px;
-  --slide-title-font-size: 108px;
-  --slide-body-font-size: 44px;
-  --slide-statement-font-size: 88px;
   --slide-code-font-size: 38px;
   --slide-code-highlight-surface: rgba(255,107,74,.10);
   --slide-code-highlight-border: #ff6b4a;
@@ -54,8 +50,21 @@
   --slide-surface-shine: rgba(255, 255, 255, .06);
 }
 
-[data-theme="minimal-light"] {
-  --slide-bg: #f4f1eb;
+:root, [data-theme="midnight"] {
+  --slide-bg: #10141d;
+  --slide-selection: rgba(255, 107, 74, .28);
+  --slide-grid-line: rgba(255, 255, 255, .055);
+  --slide-spotlight: rgba(255, 107, 74, .15);
+  --slide-gradient-start: #191d2c;
+  --slide-gradient-end: #10141d;
+  --slide-quote: #c8d1dc;
+  --slide-heading-font-size: 72px;
+  --slide-title-font-size: 108px;
+  --slide-body-font-size: 44px;
+  --slide-statement-font-size: 88px;
+}
+
+[data-theme="minimal-light"], [data-code-theme="minimal-light"] {
   --slide-fg: #1c2027;
   --slide-muted: #4d5660;
   --slide-accent: #bc3e27;
@@ -79,20 +88,7 @@
   --slide-syntax-error: #a52121;
   --slide-highlight: rgba(188, 62, 39, .13);
   --slide-focus: #9d3e28;
-  --slide-selection: rgba(188, 62, 39, .2);
-  --slide-grid-line: rgba(28, 32, 39, .08);
-  --slide-spotlight: rgba(188, 62, 39, .12);
-  --slide-gradient-start: #fffdf8;
-  --slide-gradient-end: #e9e5dc;
   --slide-link: #176d82;
-  --slide-quote: #424a54;
-  --slide-dot-close: #cf6753;
-  --slide-dot-minimize: #c09243;
-  --slide-dot-maximize: #579966;
-  --slide-heading-font-size: 72px;
-  --slide-title-font-size: 96px;
-  --slide-body-font-size: 44px;
-  --slide-statement-font-size: 88px;
   --slide-code-font-size: 38px;
   --slide-code-highlight-surface: rgba(188,62,39,.07);
   --slide-code-highlight-border: #bc3e27;
@@ -101,8 +97,21 @@
   --slide-surface-shine: rgba(255, 255, 255, .06);
 }
 
-[data-theme="minimal-dark"] {
-  --slide-bg: #171717;
+[data-theme="minimal-light"] {
+  --slide-bg: #f4f1eb;
+  --slide-selection: rgba(188, 62, 39, .2);
+  --slide-grid-line: rgba(28, 32, 39, .08);
+  --slide-spotlight: rgba(188, 62, 39, .12);
+  --slide-gradient-start: #fffdf8;
+  --slide-gradient-end: #e9e5dc;
+  --slide-quote: #424a54;
+  --slide-heading-font-size: 72px;
+  --slide-title-font-size: 96px;
+  --slide-body-font-size: 44px;
+  --slide-statement-font-size: 88px;
+}
+
+[data-theme="minimal-dark"], [data-code-theme="minimal-dark"] {
   --slide-fg: #f4f1ea;
   --slide-muted: #bcb8b0;
   --slide-accent: #e6b566;
@@ -126,20 +135,7 @@
   --slide-syntax-error: #f28272;
   --slide-highlight: rgba(230, 181, 102, .16);
   --slide-focus: #f0bd75;
-  --slide-selection: rgba(230, 181, 102, .25);
-  --slide-grid-line: rgba(255, 255, 255, .06);
-  --slide-spotlight: rgba(230, 181, 102, .13);
-  --slide-gradient-start: #25221e;
-  --slide-gradient-end: #171717;
   --slide-link: #83ced1;
-  --slide-quote: #d3cec4;
-  --slide-dot-close: #d97762;
-  --slide-dot-minimize: #d4a052;
-  --slide-dot-maximize: #70ad7e;
-  --slide-heading-font-size: 72px;
-  --slide-title-font-size: 108px;
-  --slide-body-font-size: 44px;
-  --slide-statement-font-size: 88px;
   --slide-code-font-size: 38px;
   --slide-code-highlight-surface: rgba(230,181,102,.10);
   --slide-code-highlight-border: #e6b566;
@@ -148,8 +144,21 @@
   --slide-surface-shine: rgba(255, 255, 255, .06);
 }
 
-[data-theme="ruby"] {
-  --slide-bg: #210f18;
+[data-theme="minimal-dark"] {
+  --slide-bg: #171717;
+  --slide-selection: rgba(230, 181, 102, .25);
+  --slide-grid-line: rgba(255, 255, 255, .06);
+  --slide-spotlight: rgba(230, 181, 102, .13);
+  --slide-gradient-start: #25221e;
+  --slide-gradient-end: #171717;
+  --slide-quote: #d3cec4;
+  --slide-heading-font-size: 72px;
+  --slide-title-font-size: 108px;
+  --slide-body-font-size: 44px;
+  --slide-statement-font-size: 88px;
+}
+
+[data-theme="ruby"], [data-code-theme="ruby"] {
   --slide-fg: #fff4ed;
   --slide-muted: #dfbcc3;
   --slide-accent: #ff7a68;
@@ -173,20 +182,7 @@
   --slide-syntax-error: #ff8176;
   --slide-highlight: rgba(255, 122, 104, .18);
   --slide-focus: #ffb09a;
-  --slide-selection: rgba(255, 122, 104, .28);
-  --slide-grid-line: rgba(255, 229, 220, .065);
-  --slide-spotlight: rgba(255, 122, 104, .16);
-  --slide-gradient-start: #3a1828;
-  --slide-gradient-end: #210f18;
   --slide-link: #8ed9e0;
-  --slide-quote: #f1c7c9;
-  --slide-dot-close: #f07769;
-  --slide-dot-minimize: #dca25a;
-  --slide-dot-maximize: #71b587;
-  --slide-heading-font-size: 72px;
-  --slide-title-font-size: 108px;
-  --slide-body-font-size: 44px;
-  --slide-statement-font-size: 88px;
   --slide-code-font-size: 38px;
   --slide-code-highlight-surface: rgba(255,122,104,.10);
   --slide-code-highlight-border: #ff7a68;
@@ -194,6 +190,228 @@
   --slide-code-inset: rgba(255, 255, 255, .06);
   --slide-surface-shine: rgba(255, 255, 255, .06);
 }
+
+[data-theme="ruby"] {
+  --slide-bg: #210f18;
+  --slide-selection: rgba(255, 122, 104, .28);
+  --slide-grid-line: rgba(255, 229, 220, .065);
+  --slide-spotlight: rgba(255, 122, 104, .16);
+  --slide-gradient-start: #3a1828;
+  --slide-gradient-end: #210f18;
+  --slide-quote: #f1c7c9;
+  --slide-heading-font-size: 72px;
+  --slide-title-font-size: 108px;
+  --slide-body-font-size: 44px;
+  --slide-statement-font-size: 88px;
+}
+
+/* Catppuccin Latte, from the palette shared by
+   https://github.com/catppuccin/ghostty. Hues are the published values;
+   lightness is adjusted only where a token cannot otherwise clear the
+   4.5:1 contrast gate that test/theme_contrast_test.rb enforces. */
+[data-theme="catppuccin-latte"], [data-code-theme="catppuccin-latte"] {
+  --slide-fg: #4c4f69;
+  --slide-muted: #5b5e70;
+  --slide-accent: #8839ef;
+  --slide-accent-strong: #7d34dc;
+  --slide-code-surface: #e6e9ef;
+  --slide-code-header: #dce0e8;
+  --slide-code-border: #bcc0cc;
+  --slide-code-shadow: rgba(76, 79, 105, .22);
+  --slide-syntax-comment: #5b5e67;
+  --slide-syntax-keyword: #7832d3;
+  --slide-syntax-string: #2a6a1c;
+  --slide-syntax-number: #a23f07;
+  --slide-syntax-function: #1956d0;
+  --slide-syntax-operator: #02658c;
+  --slide-syntax-punctuation: #5b5e67;
+  --slide-syntax-name: #4c4f69;
+  --slide-syntax-variable: #4c4f69;
+  --slide-syntax-symbol: #10696e;
+  --slide-syntax-builtin: #b90d32;
+  --slide-syntax-constant: #835311;
+  --slide-syntax-error: #b90d32;
+  --slide-highlight: rgba(136, 57, 239, .13);
+  --slide-focus: #7d34dc;
+  --slide-link: #1b5ee1;
+  --slide-code-font-size: 38px;
+  --slide-code-highlight-surface: rgba(136, 57, 239, .07);
+  --slide-code-highlight-border: #8839ef;
+  --slide-code-focus-surface: rgba(30, 102, 245, .07);
+  --slide-code-inset: rgba(76, 79, 105, .08);
+  --slide-surface-shine: rgba(255, 255, 255, .55);
+}
+
+[data-theme="catppuccin-latte"] {
+  --slide-bg: #eff1f5;
+  --slide-selection: rgba(136, 57, 239, .20);
+  --slide-grid-line: rgba(76, 79, 105, .08);
+  --slide-spotlight: rgba(136, 57, 239, .12);
+  --slide-gradient-start: #fbfcfe;
+  --slide-gradient-end: #eff1f5;
+  --slide-quote: #5c5f77;
+  --slide-heading-font-size: 72px;
+  --slide-title-font-size: 108px;
+  --slide-body-font-size: 44px;
+  --slide-statement-font-size: 88px;
+}
+
+
+/* Catppuccin Frappe, from the palette shared by
+   https://github.com/catppuccin/ghostty. Hues are the published values;
+   lightness is adjusted only where a token cannot otherwise clear the
+   4.5:1 contrast gate that test/theme_contrast_test.rb enforces. */
+[data-theme="catppuccin-frappe"], [data-code-theme="catppuccin-frappe"] {
+  --slide-fg: #c6d0f5;
+  --slide-muted: #acb3d1;
+  --slide-accent: #ca9ee6;
+  --slide-accent-strong: #babbf1;
+  --slide-code-surface: #303446;
+  --slide-code-header: #414559;
+  --slide-code-border: #51576d;
+  --slide-code-shadow: rgba(35, 38, 52, .55);
+  --slide-syntax-comment: #aeb4cb;
+  --slide-syntax-keyword: #cea5e7;
+  --slide-syntax-string: #a6d189;
+  --slide-syntax-number: #efa27b;
+  --slide-syntax-function: #99b3ef;
+  --slide-syntax-operator: #99d1db;
+  --slide-syntax-punctuation: #acb3d1;
+  --slide-syntax-name: #c6d0f5;
+  --slide-syntax-variable: #c6d0f5;
+  --slide-syntax-symbol: #81c8be;
+  --slide-syntax-builtin: #eba0a3;
+  --slide-syntax-constant: #e5c890;
+  --slide-syntax-error: #eca1a2;
+  --slide-highlight: rgba(202, 158, 230, .17);
+  --slide-focus: #babbf1;
+  --slide-link: #99d1db;
+  --slide-code-font-size: 38px;
+  --slide-code-highlight-surface: rgba(202, 158, 230, .12);
+  --slide-code-highlight-border: #ca9ee6;
+  --slide-code-focus-surface: rgba(186, 187, 241, .12);
+  --slide-code-inset: rgba(255, 255, 255, .06);
+  --slide-surface-shine: rgba(255, 255, 255, .06);
+}
+
+[data-theme="catppuccin-frappe"] {
+  --slide-bg: #292c3c;
+  --slide-selection: rgba(202, 158, 230, .28);
+  --slide-grid-line: rgba(198, 208, 245, .06);
+  --slide-spotlight: rgba(202, 158, 230, .15);
+  --slide-gradient-start: #414559;
+  --slide-gradient-end: #292c3c;
+  --slide-quote: #b5bfe2;
+  --slide-heading-font-size: 72px;
+  --slide-title-font-size: 108px;
+  --slide-body-font-size: 44px;
+  --slide-statement-font-size: 88px;
+}
+
+
+/* Catppuccin Macchiato, from the palette shared by
+   https://github.com/catppuccin/ghostty. Hues are the published values;
+   lightness is adjusted only where a token cannot otherwise clear the
+   4.5:1 contrast gate that test/theme_contrast_test.rb enforces. */
+[data-theme="catppuccin-macchiato"], [data-code-theme="catppuccin-macchiato"] {
+  --slide-fg: #cad3f5;
+  --slide-muted: #a5adcb;
+  --slide-accent: #c6a0f6;
+  --slide-accent-strong: #b7bdf8;
+  --slide-code-surface: #24273a;
+  --slide-code-header: #363a4f;
+  --slide-code-border: #494d64;
+  --slide-code-shadow: rgba(24, 25, 38, .55);
+  --slide-syntax-comment: #9fa5bf;
+  --slide-syntax-keyword: #c6a0f6;
+  --slide-syntax-string: #a6da95;
+  --slide-syntax-number: #f5a97f;
+  --slide-syntax-function: #8aadf4;
+  --slide-syntax-operator: #91d7e3;
+  --slide-syntax-punctuation: #a5adcb;
+  --slide-syntax-name: #cad3f5;
+  --slide-syntax-variable: #cad3f5;
+  --slide-syntax-symbol: #8bd5ca;
+  --slide-syntax-builtin: #ee99a0;
+  --slide-syntax-constant: #eed49f;
+  --slide-syntax-error: #ed8b9a;
+  --slide-highlight: rgba(198, 160, 246, .17);
+  --slide-focus: #b7bdf8;
+  --slide-link: #91d7e3;
+  --slide-code-font-size: 38px;
+  --slide-code-highlight-surface: rgba(198, 160, 246, .12);
+  --slide-code-highlight-border: #c6a0f6;
+  --slide-code-focus-surface: rgba(183, 189, 248, .12);
+  --slide-code-inset: rgba(255, 255, 255, .06);
+  --slide-surface-shine: rgba(255, 255, 255, .06);
+}
+
+[data-theme="catppuccin-macchiato"] {
+  --slide-bg: #1e2030;
+  --slide-selection: rgba(198, 160, 246, .28);
+  --slide-grid-line: rgba(202, 211, 245, .06);
+  --slide-spotlight: rgba(198, 160, 246, .15);
+  --slide-gradient-start: #363a4f;
+  --slide-gradient-end: #1e2030;
+  --slide-quote: #b8c0e0;
+  --slide-heading-font-size: 72px;
+  --slide-title-font-size: 108px;
+  --slide-body-font-size: 44px;
+  --slide-statement-font-size: 88px;
+}
+
+
+/* Catppuccin Mocha, from the palette shared by
+   https://github.com/catppuccin/ghostty. Hues are the published values;
+   lightness is adjusted only where a token cannot otherwise clear the
+   4.5:1 contrast gate that test/theme_contrast_test.rb enforces. */
+[data-theme="catppuccin-mocha"], [data-code-theme="catppuccin-mocha"] {
+  --slide-fg: #cdd6f4;
+  --slide-muted: #a6adc8;
+  --slide-accent: #cba6f7;
+  --slide-accent-strong: #b4befe;
+  --slide-code-surface: #1e1e2e;
+  --slide-code-header: #313244;
+  --slide-code-border: #45475a;
+  --slide-code-shadow: rgba(17, 17, 27, .55);
+  --slide-syntax-comment: #979db5;
+  --slide-syntax-keyword: #cba6f7;
+  --slide-syntax-string: #a6e3a1;
+  --slide-syntax-number: #fab387;
+  --slide-syntax-function: #89b4fa;
+  --slide-syntax-operator: #89dceb;
+  --slide-syntax-punctuation: #a6adc8;
+  --slide-syntax-name: #cdd6f4;
+  --slide-syntax-variable: #cdd6f4;
+  --slide-syntax-symbol: #94e2d5;
+  --slide-syntax-builtin: #eba0ac;
+  --slide-syntax-constant: #f9e2af;
+  --slide-syntax-error: #f38ba8;
+  --slide-highlight: rgba(203, 166, 247, .17);
+  --slide-focus: #b4befe;
+  --slide-link: #89dceb;
+  --slide-code-font-size: 38px;
+  --slide-code-highlight-surface: rgba(203, 166, 247, .12);
+  --slide-code-highlight-border: #cba6f7;
+  --slide-code-focus-surface: rgba(180, 190, 254, .12);
+  --slide-code-inset: rgba(255, 255, 255, .06);
+  --slide-surface-shine: rgba(255, 255, 255, .06);
+}
+
+[data-theme="catppuccin-mocha"] {
+  --slide-bg: #181825;
+  --slide-selection: rgba(203, 166, 247, .28);
+  --slide-grid-line: rgba(205, 214, 244, .06);
+  --slide-spotlight: rgba(203, 166, 247, .15);
+  --slide-gradient-start: #313244;
+  --slide-gradient-end: #181825;
+  --slide-quote: #bac2de;
+  --slide-heading-font-size: 72px;
+  --slide-title-font-size: 108px;
+  --slide-body-font-size: 44px;
+  --slide-statement-font-size: 88px;
+}
+
 
 * { box-sizing: border-box; }
 ::selection { background: var(--slide-selection); color: var(--slide-fg); }

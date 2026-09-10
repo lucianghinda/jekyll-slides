@@ -12,8 +12,7 @@ module Jekyll
   # while preserving the site's theme and local overrides.
   #
   # Configure defaults under +slides:+ in _config.yml, or use front matter on
-  # individual decks. Themes are +midnight+, +minimal-light+, +minimal-dark+,
-  # and +ruby+. The supported aspect ratio is 16:9; quote this value in YAML.
+  # individual decks. The supported aspect ratio is 16:9; quote this value in YAML.
   #
   # Jekyll runs Liquid before rendering each slide as one Markdown document.
   # Jekyll::Slides::Presentation also renders slide HTML directly when Jekyll integration
@@ -21,6 +20,15 @@ module Jekyll
   module Slides
     ROOT = File.expand_path("../..", __dir__)
     LAYOUT_NAME = "presentation"
+
+    # Every theme name the plugin ships. A theme sets the whole deck through
+    # front matter, and any one of them also restyles a single editor or
+    # terminal block through that block's +theme+ attribute.
+    THEMES = %w[
+      minimal-light minimal-dark midnight ruby
+      catppuccin-latte catppuccin-frappe catppuccin-macchiato catppuccin-mocha
+    ].freeze
+    DEFAULT_THEME = "midnight"
   end
 end
 

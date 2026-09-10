@@ -165,9 +165,8 @@ module Jekyll
         line_numbers = line_numbers?(attrs.fetch("line_numbers", "true"))
         classes = ["code-window", "size-#{size}"] + attrs[:classes].reject { |name| name == "editor" }
         classes << "has-focus" unless focus.empty?
-        attributes = html_attributes(class: classes.join(" "), id: attrs[:id])
-        header = +'<header class="code-window-header"><span class="code-window-controls" aria-hidden="true"><i></i><i></i><i></i></span>'
-        header << %(<span class="code-window-language">#{Support.escape(language)}</span></header>)
+        attributes = window_attributes(classes, attrs)
+        header = window_header(language: language)
         caption = attrs["title"] ? %(<figcaption>#{Support.escape(attrs['title'])}</figcaption>) : ""
         source = lines.map { |line, newline| line + newline }.join
         highlighted = @rouge_renderer.render_lines(source, language)
@@ -187,7 +186,7 @@ module Jekyll
       def render_terminal(lines, attrs)
         size = normalize_size(attrs["size"])
         classes = ["terminal-window", "size-#{size}"] + attrs[:classes].reject { |name| name == "terminal" }
-        figure_attrs = html_attributes(class: classes.join(" "), id: attrs[:id])
+        figure_attrs = window_attributes(classes, attrs)
         caption = attrs["title"] ? %(<figcaption>#{Support.escape(attrs['title'])}</figcaption>) : ""
         body = lines.map do |line, newline|
           visible = Support.escape(line)
@@ -198,7 +197,36 @@ module Jekyll
           end
           %(<span class="tline">#{visible}#{Support.escape(newline)}</span>)
         end.join
-        %(<figure#{figure_attrs}>#{caption}<pre><code>#{body}</code></pre></figure>)
+        %(<figure#{figure_attrs}>#{caption}#{window_header}<pre><code>#{body}</code></pre></figure>)
+      end
+
+      # The macOS-style title bar both window types share: traffic lights on
+      # the left, and for editors the language on the right. The centered title
+      # is the figure's own caption, which stays a direct child of the figure so
+      # the markup remains a valid figure/figcaption pair.
+      def window_header(language: nil)
+        header = +'<header class="code-window-header"><span class="code-window-controls" aria-hidden="true"><i></i><i></i><i></i></span>'
+        header << %(<span class="code-window-language">#{Support.escape(language)}</span>) if language
+        header << "</header>"
+      end
+
+      def window_attributes(classes, attrs)
+        html_attributes(
+          "class" => classes.join(" "),
+          "id" => attrs[:id],
+          "data-code-theme" => component_theme(attrs["theme"])
+        )
+      end
+
+      # A component may carry any deck theme, so one window can show a light
+      # terminal inside a dark deck. Returns nil to inherit the deck theme.
+      def component_theme(value)
+        return nil if value.nil? || value.to_s.empty?
+        return value.to_s if THEMES.include?(value.to_s)
+
+        Support.warn(@warning, "Unsupported component theme #{value.inspect}; expected one of #{THEMES.join(', ')}; " \
+                               "using the deck theme")
+        nil
       end
 
       def line_range(value, max_line: nil)

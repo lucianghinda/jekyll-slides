@@ -2,8 +2,13 @@
 
 All notable changes to Jekyll Slides are documented here.
 
-## Unreleased
+## 0.3.0 — 2026-09-10
 
+- Add the four Catppuccin flavors as presentation themes: `catppuccin-latte`, `catppuccin-frappe`, `catppuccin-macchiato`, and `catppuccin-mocha`, ported from the palette shared by [catppuccin/ghostty](https://github.com/catppuccin/ghostty). Hues are the published values; lightness is adjusted only where a token cannot otherwise clear the 4.5:1 contrast checked on every code surface.
+- Add a `theme` attribute to editor and terminal blocks, so one window can carry any theme while the deck around it keeps its own. The override repaints that window's surface, title bar, syntax colors, prompt, and body text. An unknown name warns and falls back to the deck theme.
+- Give terminal windows a real title bar. It was previously an empty `::before` bar that could hold neither the window controls nor the title, which floated above it.
+- Center editor and terminal titles inside the title bar, and size the controls and bar with the component `size`.
+- Use the macOS traffic-light colors for the window controls in every theme, the way a real title bar does; only the window surface follows the theme. Themes no longer set `--slide-dot-close`, `--slide-dot-minimize`, or `--slide-dot-maximize`.
 - Rename the generated LLM index from `llm.txt` to `llms.txt`, matching the llmstxt.org convention used across these plugins.
 
 ## 0.2.0 — 2026-09-06

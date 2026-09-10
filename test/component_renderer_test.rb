@@ -74,6 +74,49 @@ class ComponentRendererTest < Minitest::Test
     refute_includes html, "data-line-number"
   end
 
+  def test_both_window_types_render_the_same_title_bar_controls
+    controls = '<span class="code-window-controls" aria-hidden="true"><i></i><i></i><i></i></span>'
+
+    %w[editor terminal].each do |component|
+      html = render("```ruby\nputs 1\n```\n{: .#{component} title=\"Demo\"}")
+
+      assert_includes html, '<header class="code-window-header">', component
+      assert_includes html, controls, component
+      # The caption stays a figure child, so the figure remains valid markup.
+      assert_match(%r{<figure[^>]*><figcaption>Demo</figcaption><header}, html, component)
+    end
+  end
+
+  def test_terminal_title_bar_omits_the_language_the_editor_shows
+    assert_includes render("```ruby\nputs 1\n```\n{: .editor}"), '<span class="code-window-language">ruby</span>'
+    refute_includes render("```ruby\nputs 1\n```\n{: .terminal}"), "code-window-language"
+  end
+
+  def test_a_single_window_can_carry_any_deck_theme
+    %w[editor terminal].each do |component|
+      warnings = []
+      html = render("```ruby\nputs 1\n```\n{: .#{component} theme=\"catppuccin-mocha\"}", warnings: warnings)
+
+      assert_includes html, 'data-code-theme="catppuccin-mocha"', component
+      assert_empty warnings, component
+    end
+  end
+
+  def test_unknown_component_theme_warns_and_inherits_the_deck_theme
+    warnings = []
+    html = render("```ruby\nputs 1\n```\n{: .editor theme=\"dracula\"}", warnings: warnings)
+
+    refute_includes html, "data-code-theme"
+    assert_equal 1, warnings.length
+    assert_includes warnings.first, "Unsupported component theme"
+    assert_includes warnings.first, "catppuccin-mocha"
+  end
+
+  def test_windows_without_a_theme_attribute_inherit_the_deck_theme
+    refute_includes render("```ruby\nputs 1\n```\n{: .editor}"), "data-code-theme"
+    refute_includes render("```console\n$ ls\n```\n{: .terminal}"), "data-code-theme"
+  end
+
   def test_indented_four_backtick_component_and_longer_closing_fence
     source = "  ````ruby\n  one\n  ```\n  ---\n  `````\n  {: .editor line_numbers=\"true\"}"
     html = render(source)

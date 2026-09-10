@@ -13,9 +13,8 @@ includes, styles, scripts, and offline fonts while preserving the site's theme
 and local overrides.
 
 Configure defaults under <code>slides:</code> in _config.yml, or use front
-matter on individual decks. Themes are `midnight`, <code>minimal-light</code>,
-<code>minimal-dark</code>, and `ruby`. The supported aspect ratio is 16:9;
-quote this value in YAML.
+matter on individual decks. The supported aspect ratio is 16:9; quote this
+value in YAML.
 
 Jekyll runs Liquid before rendering each slide as one Markdown document.
 Jekyll::Slides::Presentation also renders slide HTML directly when Jekyll
@@ -23,11 +22,19 @@ integration is not needed; it does not evaluate Liquid or wrap the
 presentation layout.
 
 ## Constants
+### `DEFAULT_THEME` <a id="constant-DEFAULT_THEME"></a> <a id="DEFAULT_THEME-constant"></a>
+Not documented.
+
 ### `LAYOUT_NAME` <a id="constant-LAYOUT_NAME"></a> <a id="LAYOUT_NAME-constant"></a>
 Not documented.
 
 ### `ROOT` <a id="constant-ROOT"></a> <a id="ROOT-constant"></a>
 Not documented.
+
+### `THEMES` <a id="constant-THEMES"></a> <a id="THEMES-constant"></a>
+Every theme name the plugin ships. A theme sets the whole deck through front
+matter, and any one of them also restyles a single editor or terminal block
+through that block's `theme` attribute.
 
 ### `VERSION` <a id="constant-VERSION"></a> <a id="VERSION-constant"></a>
 Not documented.

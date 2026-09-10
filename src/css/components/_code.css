@@ -1,14 +1,19 @@
-.code-window, .terminal-window { @apply relative overflow-hidden; min-width: 0; min-height: 0; max-height: 100%; border: 2px solid color-mix(in srgb, var(--slide-code-border), transparent 15%); border-radius: var(--slide-radius); background: var(--slide-code-surface); box-shadow: 0 24px 60px var(--slide-code-shadow), inset 0 1px 0 var(--slide-code-inset); font-family: var(--font-slide-mono); font-size: var(--slide-code-font-size); font-weight: 450; font-variant-ligatures: none; line-height: 1.45; }
+.code-window, .terminal-window { @apply relative overflow-hidden; --slide-window-bar: 72px; min-width: 0; min-height: 0; max-height: 100%; border: 2px solid color-mix(in srgb, var(--slide-code-border), transparent 15%); border-radius: var(--slide-radius); background: var(--slide-code-surface); box-shadow: 0 24px 60px var(--slide-code-shadow), inset 0 1px 0 var(--slide-code-inset); font-family: var(--font-slide-mono); font-size: var(--slide-code-font-size); font-weight: 450; font-variant-ligatures: none; line-height: 1.45; }
 .code-window, .terminal-window { display: flex; flex-direction: column; }
-.code-window figcaption, .terminal-window figcaption { position: absolute; z-index: 2; top: 16px; left: 50%; max-width: 70%; overflow: hidden; color: var(--slide-muted); font-family: var(--font-slide-sans); font-size: 28px; font-weight: 500; letter-spacing: .015em; text-overflow: ellipsis; transform: translateX(-50%); white-space: nowrap; }
-.code-window-header, .terminal-window::before { display: flex; align-items: center; height: 72px; flex: 0 0 72px; padding: 0 28px; border-bottom: 2px solid var(--slide-code-border); background: var(--slide-code-header); }
-.code-window-controls { display: flex; gap: 10px; }
-.code-window-controls i { display: block; width: 14px; height: 14px; border-radius: 50%; background: var(--slide-muted); opacity: .65; }
+/* The caption stays a direct child of the figure, so it is centered over the
+   title bar instead of being laid out inside it. line-height does the vertical
+   centering, which keeps text-overflow: ellipsis working on the one-line title.
+   The max-width keeps it clear of the controls and language, including in
+   narrow document flow. */
+.code-window figcaption, .terminal-window figcaption { position: absolute; z-index: 2; top: 0; left: 50%; max-width: min(50%, max(0px, calc(100% - 224px))); height: var(--slide-window-bar); overflow: hidden; color: var(--slide-muted); font-family: var(--font-slide-sans); font-size: 28px; font-weight: 500; letter-spacing: .015em; line-height: var(--slide-window-bar); text-overflow: ellipsis; transform: translateX(-50%); white-space: nowrap; }
+/* macOS title bar: traffic lights pinned left, a soft highlight down from the
+   top edge, and a hairline separating the bar from the window body. */
+.code-window-header { display: flex; align-items: center; height: var(--slide-window-bar); flex: 0 0 var(--slide-window-bar); padding: 0 28px; border-bottom: 2px solid var(--slide-code-border); background: linear-gradient(var(--slide-surface-shine), transparent 62%), var(--slide-code-header); }
+.code-window-controls { display: flex; gap: calc(var(--slide-window-bar) * .19); }
+.code-window-controls i { display: block; width: calc(var(--slide-window-bar) * .3); height: calc(var(--slide-window-bar) * .3); border-radius: 50%; box-shadow: inset 0 0 0 1px var(--slide-dot-rim), inset 0 calc(var(--slide-window-bar) * .04) calc(var(--slide-window-bar) * .05) var(--slide-dot-gloss); }
 .code-window-controls i:first-child { background: var(--slide-dot-close); }
 .code-window-controls i:nth-child(2) { background: var(--slide-dot-minimize); }
 .code-window-controls i:last-child { background: var(--slide-dot-maximize); }
-/* Keep centered captions clear of the controls and language, including narrow document flow. */
-.code-window figcaption { max-width: min(50%, max(0px, calc(100% - 224px))); }
 .code-window-language { margin-inline-start: auto; max-width: max(0px, calc(25% - 40px)); overflow: hidden; color: var(--slide-muted); font-size: 24px; letter-spacing: .04em; text-overflow: ellipsis; text-transform: uppercase; white-space: nowrap; }
 .code-window pre, .terminal-window pre { min-height: 0; margin: 0; overflow: auto; padding: 32px 34px 36px; font-family: inherit; tab-size: 2; scrollbar-width: thin; scrollbar-color: var(--slide-muted) transparent; }
 .code-window code, .terminal-window code { display: block; color: var(--slide-fg); font: inherit; }
@@ -43,13 +48,10 @@
 .highlighter-rouge .highlight, figure.highlight { overflow: auto; border: 1px solid var(--slide-code-border); border-radius: 16px; background: var(--slide-code-surface); box-shadow: inset 0 1px 0 var(--slide-code-inset); font-size: var(--slide-code-font-size); font-weight: 450; font-variant-ligatures: none; line-height: 1.45; scrollbar-width: thin; scrollbar-color: var(--slide-muted) transparent; }
 .highlighter-rouge pre, figure.highlight pre { margin: 0; padding: 28px 32px; }
 .highlighter-rouge code, figure.highlight code { color: var(--slide-fg); font: inherit; }
-.code-window.size-sm, .terminal-window.size-sm { font-size: 32px; }
-.code-window.size-md, .terminal-window.size-md { font-size: 38px; }
-.code-window.size-lg, .terminal-window.size-lg { font-size: 42px; }
-.code-window.size-sm .code-window-header, .terminal-window.size-sm::before { height: 62px; flex-basis: 62px; }
-.code-window.size-lg .code-window-header, .terminal-window.size-lg::before { height: 82px; flex-basis: 82px; }
+.code-window.size-sm, .terminal-window.size-sm { --slide-window-bar: 62px; font-size: 32px; }
+.code-window.size-md, .terminal-window.size-md { --slide-window-bar: 72px; font-size: 38px; }
+.code-window.size-lg, .terminal-window.size-lg { --slide-window-bar: 82px; font-size: 42px; }
 .terminal-window { background: var(--slide-code-surface); }
-.terminal-window::before { content: ""; background: var(--slide-code-header); }
 .terminal-window pre { padding-top: 28px; }
 .terminal-window .tline { display: block; min-height: 1.45em; white-space: pre-wrap; }
 .terminal-window .prompt { color: var(--slide-accent-strong); font-weight: 700; }

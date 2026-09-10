@@ -5,6 +5,8 @@ Jekyll,Module,Jekyll.md
 Jekyll::Slides,Module,Jekyll/Slides.md
 Jekyll::Slides.ROOT,Constant,Jekyll/Slides.md#constant-ROOT
 Jekyll::Slides.LAYOUT_NAME,Constant,Jekyll/Slides.md#constant-LAYOUT_NAME
+Jekyll::Slides.THEMES,Constant,Jekyll/Slides.md#constant-THEMES
+Jekyll::Slides.DEFAULT_THEME,Constant,Jekyll/Slides.md#constant-DEFAULT_THEME
 Jekyll::Slides.VERSION,Constant,Jekyll/Slides.md#constant-VERSION
 Jekyll::Slides::Assets,Module,Jekyll/Slides/Assets.md
 Jekyll::Slides::Assets.asset_files,Method,Jekyll/Slides/Assets.md#method-c-asset_files
@@ -20,7 +22,6 @@ Jekyll::Slides::DeckAssembler,Module,Jekyll/Slides/DeckAssembler.md
 Jekyll::Slides::DeckAssembler.assemble,Method,Jekyll/Slides/DeckAssembler.md#method-c-assemble
 Jekyll::Slides::JekyllIntegration,Module,Jekyll/Slides/JekyllIntegration.md
 Jekyll::Slides::JekyllIntegration.DEFAULTS,Constant,Jekyll/Slides/JekyllIntegration.md#constant-DEFAULTS
-Jekyll::Slides::JekyllIntegration.THEMES,Constant,Jekyll/Slides/JekyllIntegration.md#constant-THEMES
 Jekyll::Slides::JekyllIntegration.BOOLEAN_OPTIONS,Constant,Jekyll/Slides/JekyllIntegration.md#constant-BOOLEAN_OPTIONS
 Jekyll::Slides::JekyllIntegration.OPTION_KEYS,Constant,Jekyll/Slides/JekyllIntegration.md#constant-OPTION_KEYS
 Jekyll::Slides::JekyllIntegration.install!,Method,Jekyll/Slides/JekyllIntegration.md#method-c-install-21

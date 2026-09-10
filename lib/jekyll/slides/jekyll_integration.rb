@@ -6,14 +6,13 @@ module Jekyll
   module Slides
     module JekyllIntegration
       DEFAULTS = {
-        "theme" => "midnight",
+        "theme" => DEFAULT_THEME,
         "aspect_ratio" => "16:9",
         "progress" => true,
         "slide_numbers" => true,
         "overview" => true,
         "fullscreen" => true
       }.freeze
-      THEMES = %w[minimal-light minimal-dark midnight ruby].freeze
       BOOLEAN_OPTIONS = %w[progress slide_numbers overview fullscreen].freeze
       OPTION_KEYS = DEFAULTS.keys.freeze
 
@@ -85,7 +84,7 @@ module Jekyll
             theme = value.to_s
             return theme if THEMES.include?(theme)
 
-            warning("Invalid theme #{value.inspect}; falling back to midnight")
+            warning("Invalid theme #{value.inspect}; expected one of #{THEMES.join(', ')}; falling back to #{DEFAULT_THEME}")
             DEFAULTS[key]
           when "aspect_ratio"
             return value if value == DEFAULTS[key]

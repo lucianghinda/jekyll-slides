@@ -23,12 +23,44 @@ class PresentationCssTest < Minitest::Test
     end
   end
 
+  THEMES = %w[
+    minimal-light minimal-dark midnight ruby
+    catppuccin-latte catppuccin-frappe catppuccin-macchiato catppuccin-mocha
+  ].freeze
+
   def test_public_theme_and_layout_selectors_remain_available
-    %w[minimal-light minimal-dark midnight ruby].each { |theme| assert_includes source, %(data-theme="#{theme}") }
+    THEMES.each { |theme| assert_includes source, %(data-theme="#{theme}") }
     %w[title statement content code code-left code-right split-code code-result].each do |layout|
       assert_includes source, ".layout-#{layout}"
     end
     %w[plain gradient grid spotlight].each { |background| assert_includes source, ".bg-#{background}" }
+  end
+
+  def test_every_theme_is_also_available_to_a_single_window
+    THEMES.each { |theme| assert_includes source, %([data-code-theme="#{theme}"]) }
+  end
+
+  def test_both_window_types_share_one_macos_title_bar
+    # The terminal used to fake its bar with ::before, which cannot hold
+    # traffic lights or a title. Both windows now render a real header.
+    refute_match(/\.terminal-window::before/, source)
+    assert_match(/\.code-window-header\s*\{[^}]*height:\s*var\(--slide-window-bar\)/, source)
+    assert_match(/\.code-window-controls i\s*\{[^}]*var\(--slide-dot-rim\)/, source)
+    %w[close minimize maximize].each do |control|
+      assert_match(/background:\s*var\(--slide-dot-#{control}\)/, source)
+    end
+  end
+
+  def test_window_titles_are_centered_in_the_title_bar
+    caption = source[/\.code-window figcaption, \.terminal-window figcaption\s*\{([^}]*)\}/, 1]
+
+    refute_nil caption
+    assert_match(/top:\s*0/, caption)
+    assert_match(/height:\s*var\(--slide-window-bar\)/, caption)
+    assert_match(/line-height:\s*var\(--slide-window-bar\)/, caption)
+    # line-height, not flex centering, so the one-line title can still ellipsize.
+    assert_match(/text-overflow:\s*ellipsis/, caption)
+    refute_match(/display:\s*flex/, caption)
   end
 
   def test_code_components_inherit_the_theme_monospace_font

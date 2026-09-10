@@ -136,7 +136,7 @@ ruby 3.4.1
 {: .terminal #ruby-version title="terminal" size="sm"}
 ````
 
-Editor/terminal attributes are `title`, `id` (or `#id`), `size` (`sm`, `md`, `lg`), `line_numbers` (`true`/`false`), `focus`, and `highlight`. Ranges accept comma-separated lines and ranges such as `2,4-6,9`; invalid values fall back safely with a Jekyll warning. Terminal prompts beginning with `$ `, `> `, or `❯ ` are styled separately. Source remains server-rendered and copyable.
+Editor/terminal attributes are `title`, `id` (or `#id`), `size` (`sm`, `md`, `lg`), `theme`, `line_numbers` (`true`/`false`), `focus`, and `highlight`. Ranges accept comma-separated lines and ranges such as `2,4-6,9`; invalid values fall back safely with a Jekyll warning. Terminal prompts beginning with `$ `, `> `, or `❯ ` are styled separately. Source remains server-rendered and copyable.
 
 Long editor and terminal blocks scroll within the slide. Blocks over 20 lines produce an advisory build warning; the amount that fits depends on the layout and font size. Split long examples across slides for print, where scrolling is unavailable.
 
@@ -146,7 +146,7 @@ Code remains selectable and copyable with normal browser controls; version 0.1 d
 
 ## Themes and configuration
 
-Presentation themes are `minimal-light`, `minimal-dark`, `midnight` (the default), and `ruby`. These style the slides without replacing the site's Jekyll theme. Configure defaults under `slides:`:
+Presentation themes are `minimal-light`, `minimal-dark`, `midnight` (the default), `ruby`, and the four Catppuccin flavors `catppuccin-latte`, `catppuccin-frappe`, `catppuccin-macchiato`, and `catppuccin-mocha`. These style the slides without replacing the site's Jekyll theme. Configure defaults under `slides:`:
 
 ```yaml
 slides:
@@ -162,11 +162,31 @@ The same keys can be overridden per presentation in front matter (`theme`, `aspe
 
 For a light presentation, set `slides: { theme: minimal-light }` in `_config.yml`, or `theme: minimal-light` in the deck's front matter. The [readability example](https://github.com/lucianghinda/jekyll-slides/blob/main/examples/readability.md) demonstrates the light theme with code, terminal output, tables, and prose.
 
+### Terminal themes
+
+The Catppuccin flavors are ported from the palette shared by [catppuccin/ghostty](https://github.com/catppuccin/ghostty). Hues are the published values; lightness is adjusted only where a token cannot otherwise clear the 4.5:1 contrast the project checks on every code surface. Latte, the light flavor, needed the most adjustment.
+
+Any theme also works on a single editor or terminal block through a `theme` attribute, so one window can carry a different palette from the deck around it:
+
+````markdown
+```console
+$ ghostty --version
+ghostty 1.0.1
+```
+{: .terminal title="ghostty" theme="catppuccin-latte"}
+````
+
+The override repaints that window completely: surface, title bar, syntax colors, prompt, and body text. Everything outside it keeps the deck theme. An unknown name warns during the build and falls back to the deck theme. The [terminal themes example](https://github.com/lucianghinda/jekyll-slides/blob/main/examples/terminal-themes.md) shows a deck-wide flavor next to per-window overrides.
+
+### Window chrome
+
+Editors and terminals render the same macOS-style title bar: traffic lights on the left, the `title` centered in the bar, and for editors the language on the right. The traffic lights keep the macOS red, amber, and green in every theme, the way a real title bar does; only the window surface follows the theme. Bar height, control size, and spacing scale with the component `size`.
+
 ## Typography and readability
 
 The gem bundles Atkinson Hyperlegible Next for text and Atkinson Hyperlegible Mono for code, including variable upright and italic faces. Fonts load from the site's own assets and work offline. The font files retain their SIL Open Font License; source revisions, checksums, and notices are in [assets/fonts](https://github.com/lucianghinda/jekyll-slides/blob/main/assets/fonts/README.md).
 
-On the 1920×1080 slide canvas, body text is 44px, section headings are 72px, and code sizes `sm`, `md`, and `lg` are 32px, 38px, and 42px. These sizes scale with the slide. Filenames and line numbers remain readable, and focused lines use borders and background color while keeping surrounding code fully visible. All four themes check syntax-token contrast against normal, highlighted, and focused code surfaces.
+On the 1920×1080 slide canvas, body text is 44px, section headings are 72px, and code sizes `sm`, `md`, and `lg` are 32px, 38px, and 42px. These sizes scale with the slide. Filenames and line numbers remain readable, and focused lines use borders and background color while keeping surrounding code fully visible. All eight themes check syntax-token contrast against normal, highlighted, and focused code surfaces, both deck-wide and as a single-window override.
 
 Prefer medium or large code and short examples for projection. Long blocks can scroll, but an audience cannot reveal hidden lines independently; split examples when presenting or printing. Screen contrast tests do not replace checking the actual projector and viewing distance.
 
