@@ -1,16 +1,20 @@
-.code-window, .terminal-window { @apply relative overflow-hidden; --slide-window-bar: 72px; min-width: 0; min-height: 0; max-height: 100%; border: 2px solid color-mix(in srgb, var(--slide-code-border), transparent 15%); border-radius: var(--slide-radius); background: var(--slide-code-surface); box-shadow: 0 24px 60px var(--slide-code-shadow), inset 0 1px 0 var(--slide-code-inset); font-family: var(--font-slide-mono); font-size: var(--slide-code-font-size); font-weight: 450; font-variant-ligatures: none; line-height: 1.45; }
+/* --slide-window-controls is the width of the traffic-light run: three dots
+   of .3 bar with two gaps of .19 between them. Deriving it from the bar
+   height keeps the title aligned at every component size. */
+.code-window, .terminal-window { @apply relative overflow-hidden; --slide-window-bar: 72px; --slide-window-pad: 28px; --slide-window-controls: calc(var(--slide-window-bar) * 1.28); min-width: 0; min-height: 0; max-height: 100%; border: 1px solid var(--slide-code-border); border-radius: var(--slide-radius); background: var(--slide-code-surface); box-shadow: 0 12px 32px var(--slide-code-shadow); font-family: var(--font-slide-mono); font-size: var(--slide-code-font-size); font-weight: 450; font-variant-ligatures: none; line-height: 1.45; }
 .code-window, .terminal-window { display: flex; flex-direction: column; }
-/* The caption stays a direct child of the figure, so it is centered over the
-   title bar instead of being laid out inside it. line-height does the vertical
-   centering, which keeps text-overflow: ellipsis working on the one-line title.
-   The max-width keeps it clear of the controls and language, including in
-   narrow document flow. */
-.code-window figcaption, .terminal-window figcaption { position: absolute; z-index: 2; top: 0; left: 50%; max-width: min(50%, max(0px, calc(100% - 224px))); height: var(--slide-window-bar); overflow: hidden; color: var(--slide-muted); font-family: var(--font-slide-sans); font-size: 28px; font-weight: 500; letter-spacing: .015em; line-height: var(--slide-window-bar); text-overflow: ellipsis; transform: translateX(-50%); white-space: nowrap; }
-/* macOS title bar: traffic lights pinned left, a soft highlight down from the
-   top edge, and a hairline separating the bar from the window body. */
-.code-window-header { display: flex; align-items: center; height: var(--slide-window-bar); flex: 0 0 var(--slide-window-bar); padding: 0 28px; border-bottom: 2px solid var(--slide-code-border); background: linear-gradient(var(--slide-surface-shine), transparent 62%), var(--slide-code-header); }
+/* The caption stays a direct child of the figure, so the markup remains a
+   valid figure/figcaption pair; it is positioned into the title bar rather
+   than laid out inside it. It starts after the traffic lights and stops
+   before the language label. line-height does the vertical centering, which
+   keeps text-overflow: ellipsis working on the one-line title. */
+.code-window figcaption, .terminal-window figcaption { position: absolute; z-index: 2; top: 0; inset-inline-start: calc(var(--slide-window-pad) + var(--slide-window-controls) + 24px); max-width: max(0px, calc(75% - var(--slide-window-pad) - var(--slide-window-controls) - 36px)); height: var(--slide-window-bar); overflow: hidden; color: var(--slide-muted); font-family: var(--font-slide-sans); font-size: 28px; font-weight: 500; letter-spacing: .015em; line-height: var(--slide-window-bar); text-overflow: ellipsis; white-space: nowrap; }
+/* macOS title bar: traffic lights pinned left, then the title, then the
+   editor language. One flat fill from the palette and a hairline separating
+   the bar from the window body. */
+.code-window-header { display: flex; align-items: center; height: var(--slide-window-bar); flex: 0 0 var(--slide-window-bar); padding: 0 var(--slide-window-pad); border-bottom: 1px solid var(--slide-code-border); background: var(--slide-code-header); }
 .code-window-controls { display: flex; gap: calc(var(--slide-window-bar) * .19); }
-.code-window-controls i { display: block; width: calc(var(--slide-window-bar) * .3); height: calc(var(--slide-window-bar) * .3); border-radius: 50%; box-shadow: inset 0 0 0 1px var(--slide-dot-rim), inset 0 calc(var(--slide-window-bar) * .04) calc(var(--slide-window-bar) * .05) var(--slide-dot-gloss); }
+.code-window-controls i { display: block; width: calc(var(--slide-window-bar) * .3); height: calc(var(--slide-window-bar) * .3); border-radius: 50%; box-shadow: inset 0 0 0 1px var(--slide-dot-rim); }
 .code-window-controls i:first-child { background: var(--slide-dot-close); }
 .code-window-controls i:nth-child(2) { background: var(--slide-dot-minimize); }
 .code-window-controls i:last-child { background: var(--slide-dot-maximize); }
@@ -45,7 +49,10 @@
 .code-window .nc, .code-window .no, .code-window .ne, .code-window .nn, .code-window .nx, :is(.highlighter-rouge, figure.highlight) .nc, :is(.highlighter-rouge, figure.highlight) .no, :is(.highlighter-rouge, figure.highlight) .ne, :is(.highlighter-rouge, figure.highlight) .nn, :is(.highlighter-rouge, figure.highlight) .nx { color: var(--slide-syntax-constant); }
 .code-window .err, :is(.highlighter-rouge, figure.highlight) .err { color: var(--slide-syntax-error); text-decoration: wavy underline var(--slide-syntax-error); text-underline-offset: 4px; }
 .highlighter-rouge, figure.highlight { min-width: 0; font-family: var(--font-slide-mono); }
-.highlighter-rouge .highlight, figure.highlight { overflow: auto; border: 1px solid var(--slide-code-border); border-radius: 16px; background: var(--slide-code-surface); box-shadow: inset 0 1px 0 var(--slide-code-inset); font-size: var(--slide-code-font-size); font-weight: 450; font-variant-ligatures: none; line-height: 1.45; scrollbar-width: thin; scrollbar-color: var(--slide-muted) transparent; }
+/* A fence whose language Rouge does not know stays a bare <pre>. It is still
+   code, so it uses the deck mono face rather than the user-agent default. */
+:where(.prose, .layout-split-code .pane) > pre { min-width: 0; overflow: auto; font-family: var(--font-slide-mono); font-variant-ligatures: none; scrollbar-width: thin; scrollbar-color: var(--slide-muted) transparent; }
+.highlighter-rouge .highlight, figure.highlight { overflow: auto; border: 1px solid var(--slide-code-border); border-radius: 16px; background: var(--slide-code-surface); font-size: var(--slide-code-font-size); font-weight: 450; font-variant-ligatures: none; line-height: 1.45; scrollbar-width: thin; scrollbar-color: var(--slide-muted) transparent; }
 .highlighter-rouge pre, figure.highlight pre { margin: 0; padding: 28px 32px; }
 .highlighter-rouge code, figure.highlight code { color: var(--slide-fg); font: inherit; }
 .code-window.size-sm, .terminal-window.size-sm { --slide-window-bar: 62px; font-size: 32px; }

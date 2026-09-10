@@ -78,7 +78,7 @@ body {
   @apply relative flex flex-col;
   width: 100%;
   height: 100%;
-  padding: 108px 132px 100px;
+  padding: var(--slide-pad-block) var(--slide-pad-inline);
   z-index: 1;
 }
 
@@ -109,5 +109,14 @@ body {
 :where(.prose, .layout-split-code .pane) table { border-collapse: collapse; margin-block: 16px 28px; font-size: 1em; }
 :where(.prose, .layout-split-code .pane) th, :where(.prose, .layout-split-code .pane) td { border-bottom: 2px solid var(--slide-code-border); padding: 12px 20px; text-align: start; }
 :where(.prose, .layout-split-code .pane) th { color: var(--slide-accent-strong); font-weight: 700; }
+
+/* Paragraphs, lists, quotes, and tables end with their own margin. Code
+   blocks and figures do not, so the prose after one used to sit flush against
+   it. This is a sibling rule on purpose: the last block on a slide adds no
+   trailing space, and .layout-split-code .pane is a flex column where a bottom
+   margin and a top margin would add up instead of collapsing. :is() rather than
+   :where() because the block list has to outrank the zero-specificity
+   `margin: 0 0 28px` shorthand that already sets margin-top on prose. */
+:where(.prose, .layout-split-code .pane) > :is(pre, div.highlighter-rouge, figure) + * { margin-block-start: 28px; }
 
 .visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }

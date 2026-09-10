@@ -227,6 +227,41 @@ class JekyllIntegrationTest < Minitest::Test
     end
   end
 
+  # macos-light exists only at window scale, so a real build must put it on the
+  # figure and leave the deck's own theme, caption, and source untouched.
+  def test_real_jekyll_build_applies_a_component_only_theme_to_one_window
+    warnings = capture_warnings do
+      build_site(
+        "_config.yml" => "markdown: kramdown\nslides:\n  theme: midnight\n",
+        "deck.md" => <<~MARKDOWN
+          ---
+          layout: presentation
+          title: Themed window
+          ---
+          # Dark deck, light window
+
+          ```ruby
+          class Invoice
+            def total = items.sum(&:price)
+          end
+          ```
+          {: .editor title="app/models/invoice.rb" theme="macos-light"}
+        MARKDOWN
+      ) do |destination|
+        output = File.read(File.join(destination, "deck.html"))
+
+        assert_includes output, 'data-theme="midnight"'
+        refute_includes output, 'data-theme="macos-light"'
+        assert_includes output, 'data-code-theme="macos-light"'
+        assert_includes output, "<figcaption>app/models/invoice.rb</figcaption>"
+        assert_includes output, '<header class="code-window-header">'
+        assert_includes visible_code(output), "items.sum(&:price)"
+      end
+    end
+
+    assert_empty warnings.grep(/theme/i)
+  end
+
   def test_real_jekyll_build_preserves_raw_wrapped_liquid_source_in_editor
     build_site(
       "deck.md" => <<~MARKDOWN

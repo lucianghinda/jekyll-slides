@@ -11,4 +11,5 @@
   .slide:last-child { break-after: auto; page-break-after: auto; }
   .slide-content, .presentation-root.js.is-overview .slide-content { width: 1920px !important; height: 1080px !important; transform: scale(0.66665) !important; transform-origin: top left; }
   .code-window .line, .terminal-window .tline { opacity: 1 !important; }
+  .fragment { visibility: visible !important; opacity: 1 !important; transform: none !important; }
 }

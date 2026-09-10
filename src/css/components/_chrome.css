@@ -19,3 +19,4 @@
   *, *::before, *::after { scroll-behavior: auto !important; transition-duration: 0s !important; animation-duration: 0s !important; animation-iteration-count: 1 !important; }
 }
 .presentation-root.is-reduced-motion .presentation-chrome, .presentation-root[data-reduced-motion="true"] .presentation-chrome { transition: none; }
+.presentation-root.is-reduced-motion .fragment, .presentation-root[data-reduced-motion="true"] .fragment { transition: none; }

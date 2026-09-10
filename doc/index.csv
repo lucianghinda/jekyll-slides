@@ -6,6 +6,7 @@ Jekyll::Slides,Module,Jekyll/Slides.md
 Jekyll::Slides.ROOT,Constant,Jekyll/Slides.md#constant-ROOT
 Jekyll::Slides.LAYOUT_NAME,Constant,Jekyll/Slides.md#constant-LAYOUT_NAME
 Jekyll::Slides.THEMES,Constant,Jekyll/Slides.md#constant-THEMES
+Jekyll::Slides.COMPONENT_THEMES,Constant,Jekyll/Slides.md#constant-COMPONENT_THEMES
 Jekyll::Slides.DEFAULT_THEME,Constant,Jekyll/Slides.md#constant-DEFAULT_THEME
 Jekyll::Slides.VERSION,Constant,Jekyll/Slides.md#constant-VERSION
 Jekyll::Slides::Assets,Module,Jekyll/Slides/Assets.md

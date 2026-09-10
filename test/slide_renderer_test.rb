@@ -210,6 +210,22 @@ class SlideRendererTest < Minitest::Test
     refute_includes html, '<div class="visual"></div>'
   end
 
+  # Reveals are a runtime enhancement. The server keeps every paragraph in the
+  # document, visible, so print, no-JavaScript, and feed readers show the whole
+  # slide; only the runtime hides what has not been revealed yet.
+  def test_fragment_paragraphs_survive_rendering_and_stay_visible_in_the_document
+    markdown = "# Reveal\n\nFirst.\n\nSecond.\n{: .fragment}\n\nThird.\n{: .fragment}"
+
+    html = Jekyll::Slides::SlideRenderer.new.render(markdown)
+
+    assert_equal 2, html.scan('<p class="fragment">').length
+    assert_includes html, "<p>First.</p>"
+    assert_includes html, '<p class="fragment">Second.</p>'
+    refute_includes html, "{: .fragment}"
+    refute_includes html, "hidden"
+    refute_includes html, "inert"
+  end
+
   def test_generated_heading_ids_are_unique_within_and_across_slides
     html = Jekyll::Slides::SlideRenderer.new.render("# Repeat\n\n## Repeat\n---\n# Repeat")
 

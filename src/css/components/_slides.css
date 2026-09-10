@@ -7,16 +7,19 @@
 .bg-spotlight::before { content: ""; background: radial-gradient(circle at 70% 18%, var(--slide-spotlight), transparent 42%), var(--slide-bg); }
 .bg-gradient::after, .bg-grid::after, .bg-spotlight::after { content: ""; z-index: 0; width: 70%; height: 70%; top: -28%; right: -12%; border-radius: 50%; background: var(--slide-spotlight); filter: blur(90px); opacity: .5; }
 
-.layout-title .slide-content { justify-content: center; padding-inline: 180px; }
+.layout-title .slide-content { justify-content: center; }
 .layout-title .prose h1 { max-width: 12ch; font-size: var(--slide-title-font-size); }
 .layout-title .prose p { max-width: 28ch; color: var(--slide-muted); }
-.layout-statement .slide-content { justify-content: center; padding-inline: 180px; }
+.layout-statement .slide-content { justify-content: center; }
 .layout-statement .prose { font-size: var(--slide-statement-font-size); line-height: 1.12; letter-spacing: -.012em; }
 .layout-statement .prose :where(h1, h2) { margin-block-end: 36px; font-size: var(--slide-statement-font-size); line-height: 1.12; }
 .layout-statement .prose p { font-size: var(--slide-body-font-size); line-height: 1.4; letter-spacing: 0; }
 .layout-statement .prose p { max-width: 20ch; }
 .layout-content .slide-content { justify-content: center; }
-.layout-content .prose { max-width: 920px; }
+/* No container measure here: headings, paragraphs, lists, and quotes each
+   carry their own ch-based measure, so a cap on the whole column only ever
+   clipped the code blocks and tables that have none. */
+.layout-content .prose { max-width: 100%; }
 .layout-code .slide-content { justify-content: center; gap: 50px; }
 .layout-code .prose { flex: 0 0 auto; }
 .visual, .stack { display: flex; flex-direction: column; min-height: 0; }
@@ -65,8 +68,17 @@
   .presentation-root.js.is-overview .slide-deck, .presentation-root.js[data-overview-active="true"] .slide-deck { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(360px, 42vw), 1fr)); grid-auto-rows: max-content; align-items: start; align-content: start; gap: 32px; padding: 112px 48px 56px; overflow: auto; }
   .presentation-root.js.is-overview .slide, .presentation-root.js[data-overview-active="true"] .slide { container-type: inline-size; position: relative; inset: auto; top: auto; left: auto; margin: 0; width: 100%; height: auto; aspect-ratio: 16 / 9; min-width: 0; overflow: hidden; transform: none; visibility: visible; border: 2px solid var(--slide-code-border); border-radius: 16px; box-shadow: 0 12px 28px var(--slide-code-shadow); cursor: pointer; }
   .presentation-root.js.is-overview .slide.is-active, .presentation-root.js[data-overview-active="true"] .slide.is-active { border-color: var(--slide-accent); box-shadow: 0 0 0 4px var(--slide-highlight), 0 12px 28px var(--slide-code-shadow); }
-  .presentation-root.js.is-overview .slide-content, .presentation-root.js[data-overview-active="true"] .slide-content { --overview-slide-scale: tan(atan2(100cqw, 1920px)); width: 1920px; height: 1080px; padding: 108px 132px 100px; transform: scale(var(--overview-slide-scale, 1)); transform-origin: top left; }
+  .presentation-root.js.is-overview .slide-content, .presentation-root.js[data-overview-active="true"] .slide-content { --overview-slide-scale: tan(atan2(100cqw, 1920px)); width: 1920px; height: 1080px; padding: var(--slide-pad-block) var(--slide-pad-inline); transform: scale(var(--overview-slide-scale, 1)); transform-origin: top left; }
   .presentation-root.js.is-overview .slide:focus-visible, .presentation-root.js[data-overview-active="true"] .slide:focus-visible { outline: 5px solid var(--slide-focus); outline-offset: 6px; }
+
+  /* Opt-in paragraph reveals. Hiding lives inside this @supports block on
+     purpose: where the canvas does not apply, slides stack in document flow
+     and nothing can reveal a paragraph, so every paragraph stays readable.
+     visibility, not display, so the paragraph keeps its space and revealing it
+     moves nothing else on the slide. The runtime re-reveals everything for
+     overview and print. */
+  .presentation-root.js .fragment { transition: opacity .18s ease-out, transform .18s ease-out; }
+  .presentation-root.js .fragment:not(.is-revealed) { visibility: hidden; opacity: 0; transform: translateY(6px); }
 }
 
 /* Safari computes atan2() of two lengths with the wrong sign, so

@@ -40,6 +40,14 @@ class PresentationCssTest < Minitest::Test
     THEMES.each { |theme| assert_includes source, %([data-code-theme="#{theme}"]) }
   end
 
+  # A component-only palette: available to one window, never to a deck, and it
+  # has to reach the shipped stylesheet to be usable at all.
+  def test_the_component_only_window_palette_ships_in_the_compiled_stylesheet
+    assert_includes source, '[data-code-theme="macos-light"]'
+    refute_includes source, '[data-theme="macos-light"]'
+    assert_includes File.read(BUILT_CSS), "[data-code-theme=macos-light]"
+  end
+
   def test_both_window_types_share_one_macos_title_bar
     # The terminal used to fake its bar with ::before, which cannot hold
     # traffic lights or a title. Both windows now render a real header.
@@ -51,7 +59,7 @@ class PresentationCssTest < Minitest::Test
     end
   end
 
-  def test_window_titles_are_centered_in_the_title_bar
+  def test_window_titles_sit_after_the_traffic_lights
     caption = source[/\.code-window figcaption, \.terminal-window figcaption\s*\{([^}]*)\}/, 1]
 
     refute_nil caption
@@ -61,6 +69,45 @@ class PresentationCssTest < Minitest::Test
     # line-height, not flex centering, so the one-line title can still ellipsize.
     assert_match(/text-overflow:\s*ellipsis/, caption)
     refute_match(/display:\s*flex/, caption)
+
+    # The title now follows the controls instead of being centered over the bar.
+    refute_match(/left:\s*50%/, caption)
+    refute_match(/translateX\(-50%\)/, caption)
+    assert_match(/inset-inline-start:\s*calc\([^;]*var\(--slide-window-controls\)/, caption)
+    assert_match(/max-width:\s*max\(0px, calc\([^;]*var\(--slide-window-controls\)/, caption)
+
+    # Both offsets are derived from the bar height, so sm, md, and lg align.
+    assert_match(/--slide-window-controls:\s*calc\(var\(--slide-window-bar\) \* 1\.28\)/, source)
+    %w[sm md lg].each do |size|
+      assert_match(/\.code-window\.size-#{size}, \.terminal-window\.size-#{size} \{[^}]*--slide-window-bar:/, source)
+    end
+  end
+
+  # Flat chrome, following the supplied macOS references: one solid title-bar
+  # fill, a hairline border, and traffic lights with a rim but no gloss.
+  def test_window_chrome_is_flat
+    header = source[/\.code-window-header\s*\{([^}]*)\}/, 1]
+
+    refute_nil header
+    assert_match(/background:\s*var\(--slide-code-header\);/, header)
+    assert_match(/border-bottom:\s*1px solid var\(--slide-code-border\)/, header)
+
+    window = source[/\.code-window, \.terminal-window \{([^}]*)\}/, 1]
+
+    refute_nil window
+    assert_match(/border:\s*1px solid var\(--slide-code-border\)/, window)
+    assert_match(/box-shadow:\s*0 12px 32px var\(--slide-code-shadow\);/, window)
+
+    controls = source[/\.code-window-controls i\s*\{([^}]*)\}/, 1]
+
+    assert_match(/box-shadow:\s*inset 0 0 0 1px var\(--slide-dot-rim\);/, controls)
+
+    # The gradient, body inset, and control gloss are gone, and so are the
+    # tokens that only ever fed them.
+    refute_match(/linear-gradient/, header)
+    refute_match(/--slide-surface-shine/, source)
+    refute_match(/--slide-code-inset/, source)
+    refute_match(/--slide-dot-gloss/, source)
   end
 
   def test_code_components_inherit_the_theme_monospace_font
@@ -148,11 +195,72 @@ class PresentationCssTest < Minitest::Test
     assert_match(/\.slide-progress\s*\{[^}]*position:\s*absolute[^}]*width:\s*100%/m, source)
   end
 
+  # One inset for every layout, named once, so an overview preview and the
+  # presented slide compose their content identically.
+  def test_slide_content_uses_one_shared_inset_everywhere
+    assert_match(/--slide-pad-block:\s*72px/, source)
+    assert_match(/--slide-pad-inline:\s*80px/, source)
+    assert_match(/\.slide-content\s*\{[^}]*padding:\s*var\(--slide-pad-block\)\s+var\(--slide-pad-inline\)/m, source)
+
+    overview = source[/\.presentation-root\.js\.is-overview \.slide-content, [^{]+\{([^}]*)\}/, 1]
+
+    refute_nil overview
+    assert_match(/padding:\s*var\(--slide-pad-block\)\s+var\(--slide-pad-inline\)/, overview)
+    refute_match(/\.slide-content\s*\{[^}]*padding:\s*108px/m, source)
+    refute_match(/padding-inline:\s*180px/, source)
+  end
+
   def test_overview_thumbnails_contribute_their_height_to_grid_rows
     assert_match(/\.presentation-root\.js\.is-overview \.slide, [^{]+\{[^}]*container-type:\s*inline-size/, source)
     assert_match(/\.presentation-root\.js\.is-overview \.slide-deck, [^{]+\{[^}]*align-content:\s*start/, source)
     assert_match(/\.presentation-root\.js\.is-overview \.slide-deck, [^{]+\{[^}]*grid-auto-rows:\s*max-content/, source)
     refute_match(/--overview-slide-scale:[^;]*100cqh/, source)
+  end
+
+  # Paragraphs, lists, quotes, and tables already carry a bottom margin. Code
+  # blocks and figures carry none, so the prose after them used to sit flush
+  # against them.
+  def test_a_block_and_the_prose_after_it_keep_one_gap
+    scope = ":where(.prose, .layout-split-code .pane)"
+
+    # :is(), not :where(): the rule has to outrank the zero-specificity
+    # `margin: 0 0 28px` shorthand that already sets margin-top on a paragraph.
+    assert_match(
+      /#{Regexp.escape(scope)} > :is\(pre, div\.highlighter-rouge, figure\) \+ \*\s*\{[^}]*margin-block-start:\s*28px/,
+      source
+    )
+    %w[p blockquote].each do |element|
+      assert_match(/#{Regexp.escape(scope)} #{element} \{[^}]*margin: 0 0 28px/, source)
+    end
+    assert_match(/#{Regexp.escape(scope)} :where\(ul, ol\) \{[^}]*margin: 0 0 28px/, source)
+
+    # A block that already ends with a margin must not also gain a leading one:
+    # .layout-split-code .pane is a flex column, where sibling margins add up
+    # instead of collapsing.
+    gap_rule = source[/#{Regexp.escape(scope)} > :is\(([^)]*)\) \+ \*/, 1]
+
+    refute_nil gap_rule
+    %w[p table blockquote ul ol].each do |element|
+      refute_includes gap_rule.split(/,\s*/), element
+    end
+
+    # The gap belongs to the outer block; a code window keeps its own padding.
+    assert_match(/\.code-window pre, \.terminal-window pre\s*\{[^}]*margin:\s*0/, source)
+  end
+
+  def test_a_plain_fence_still_reads_as_code
+    assert_match(
+      /:where\(\.prose, \.layout-split-code \.pane\) > pre\s*\{[^}]*font-family:\s*var\(--font-slide-mono\)/,
+      source
+    )
+  end
+
+  # A container-wide measure clipped diagrams and code, which carry no measure
+  # of their own, while every text element already caps itself in ch.
+  def test_code_and_tables_are_not_clipped_by_the_prose_reading_measure
+    refute_match(/\.layout-content \.prose\s*\{[^}]*max-width:\s*920px/, source)
+    assert_match(/:where\(\.prose, \.layout-split-code \.pane\) p \{[^}]*max-width: 40ch/, source)
+    assert_match(/:where\(\.prose, \.layout-split-code \.pane\) :where\(h1, h2, h3, h4\) \{[^}]*max-width: 16ch/, source)
   end
 
   def test_code_windows_can_shrink_to_make_their_pre_scrollable
@@ -172,6 +280,45 @@ class PresentationCssTest < Minitest::Test
   def test_side_by_side_code_panes_allow_their_windows_to_shrink
     assert_match(/\.panes\s*\{[^}]*grid-template-rows:\s*minmax\(0,\s*1fr\)/, source)
     assert_match(/\.pane\s*\{[^}]*min-height:\s*0[^}]*max-height:\s*100%/, source)
+  end
+
+  def test_paragraph_reveals_reserve_their_space_and_fade_in_once
+    assert_match(
+      /\.presentation-root\.js \.fragment:not\(\.is-revealed\)\s*\{[^}]*visibility:\s*hidden[^}]*opacity:\s*0[^}]*transform:\s*translateY\(6px\)/,
+      source
+    )
+    assert_match(
+      /\.presentation-root\.js \.fragment\s*\{[^}]*transition:\s*opacity \.18s ease-out, transform \.18s ease-out/,
+      source
+    )
+    # display: none would reflow the rest of the slide on every reveal.
+    refute_match(/\.fragment:not\(\.is-revealed\)\s*\{[^}]*display:\s*none/, source)
+    assert_match(
+      /\.presentation-root\.is-reduced-motion \.fragment, [^{]+\{[^}]*transition:\s*none/,
+      source
+    )
+  end
+
+  # Hiding belongs to the enhanced presentation only. Stacked document flow,
+  # print, and no-JavaScript output have no way to reveal a paragraph, so they
+  # must never hide one.
+  def test_reveals_hide_nothing_outside_a_working_presentation_canvas
+    canvas_blocks = source.scan(
+      /@supports \(width: 1cqw\) and \(height: 1cqh\) and \(transform: scale\(tan\(atan2\(1px, 1px\)\)\)\) \{(.*?)\n\}/m
+    ).flatten
+
+    refute_empty canvas_blocks
+    assert(
+      canvas_blocks.any? { |block| block.include?(".fragment:not(.is-revealed)") },
+      "reveal hiding must be gated on the same @supports as the slide canvas"
+    )
+    hiding_rules = source.scan(/^[^\n{]*\.fragment:not\(\.is-revealed\)[^\n{]*\{/)
+
+    assert_equal 1, hiding_rules.length, "one place hides a paragraph, so one place can get it wrong"
+
+    print_rules = source[/@media print\s*\{.*\}\s*\z/m]
+
+    assert_match(/\.fragment \{[^}]*visibility:\s*visible\s*!important/, print_rules)
   end
 
   def test_no_javascript_mode_keeps_complete_slides_in_document_flow
