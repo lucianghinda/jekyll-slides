@@ -2,6 +2,18 @@
 
 All notable changes to Jekyll Slides are documented here.
 
+## 0.4.0 — 2026-09-10
+
+- Add opt-in paragraph reveals: mark a paragraph `{: .fragment}` and it is held back until the next step. Forward steps (`ArrowRight`, `PageDown`, `Space`, the next button, or a click on the slide) reveal one paragraph before moving to the next slide; backward steps hide the most recent reveal first. Slide numbers, the progress bar, the URL hash, and browser history keep counting slides, not reveals. Hidden paragraphs keep their space, cannot be focused or reached by assistive technology, and fade in over 180ms unless the reader prefers reduced motion. The overview, print, no-JavaScript output, and browsers without the slide canvas show every paragraph.
+- Add `macos-light`, a flat light code-window palette. It is component-only: a block selects it with `theme="macos-light"`, a deck cannot, and it repaints that window alone so it can sit inside a deck of any color.
+- Give slides more usable space. Content insets drop from `108px 132px 100px`, and from the `180px` title and statement overrides, to one shared 72px/80px pair used by both the presented slide and the overview preview.
+- Repaint `minimal-light` as a flat neutral near-white deck instead of a warm paper tint, including its plain, gradient, and code surfaces.
+- Keep 28px between a block and the prose after it. Plain fenced code, Rouge output, and figures previously carried no bottom margin, so following prose sat flush against them. A plain fence also now uses the deck's monospace face rather than the browser default.
+- Stop capping `content` slides at a 920px column. Headings, paragraphs, lists, and quotes each carry their own measure, so the column cap only ever clipped the code blocks and tables that have none.
+- Flatten the window chrome to match macOS: a solid title-bar fill with no gradient, a 1px border, a restrained shadow, and traffic lights with a rim but no gloss.
+- Move the editor and terminal title from the center of the title bar to just after the traffic lights, offset by a control run derived from the bar height so `sm`, `md`, and `lg` stay aligned. A long filename truncates before the language label.
+- Remove `--slide-surface-shine`, `--slide-code-inset`, and `--slide-dot-gloss`. The flat chrome reads none of them. Sites that forked the stylesheet and set these tokens should drop them.
+
 ## 0.3.0 — 2026-09-10
 
 - Add the four Catppuccin flavors as presentation themes: `catppuccin-latte`, `catppuccin-frappe`, `catppuccin-macchiato`, and `catppuccin-mocha`, ported from the palette shared by [catppuccin/ghostty](https://github.com/catppuccin/ghostty). Hues are the published values; lightness is adjusted only where a token cannot otherwise clear the 4.5:1 contrast checked on every code surface.
